@@ -5,6 +5,9 @@ import DeckGL from '@deck.gl/react';
 import {GeoJsonLayer, PolygonLayer} from '@deck.gl/layers';
 import {LightingEffect, AmbientLight, _SunLight as SunLight} from '@deck.gl/core';
 import {scaleThreshold} from 'd3-scale';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+
 
 // Source data GeoJSON
 const DATA_URL =

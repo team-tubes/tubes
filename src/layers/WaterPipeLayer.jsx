@@ -1,11 +1,11 @@
-import { Marker, Popup } from "react-map-gl";
+import { Popup } from "react-map-gl";
 import { useEffect, useRef, useState } from "react";
-import { format, parseISO, intervalToDuration } from "date-fns";
 import { GeoJsonLayer } from "deck.gl";
 import { DeckGLOverlay } from "../pages/MapPage";
 import {_GeoJSONLoader} from '@loaders.gl/json';
 import {buffer} from '@turf/turf'
 import {load} from '@loaders.gl/core';
+import { eventBus } from "../utils/utils";
 
 
 export const WaterPipeLayer = () => {
@@ -38,6 +38,14 @@ export const WaterPipeLayer = () => {
 		setWaterPipeData({...(wpData), features: wpData.features.map(feature => buffer(feature, (feature.properties.NOM_DIA_MM || 10) * 5, {units: "millimeters"})).filter(f => !!f)})
 	})()
   }, []);
+
+  // close any previously open water pipe popups.
+  eventBus.on("openMapPopup", () =>
+  {
+    if(isPopupOpen)
+      setIsPopupOpen(false);
+  });
+
   return (
     <>
         <DeckGLOverlay
@@ -55,7 +63,7 @@ export const WaterPipeLayer = () => {
             
             updateTriggers: {getFillColor: [timerValue]},
             // getLineWidth: (f) => f.properties.NOM_DIA_MM * 10 ,
-            onClick: e => {setCoordinates(e.coordinate); setIsPopupOpen(true); setSelectedPipe(e.object)}
+            onClick: e => {setCoordinates(e.coordinate); eventBus.dispatch("openPopup", {}); setIsPopupOpen(true); setSelectedPipe(e.object)}
             }),
           ]}
         />

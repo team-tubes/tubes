@@ -6,11 +6,9 @@ import {
 import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
 import { scaleThreshold } from "d3-scale";
-import "mapbox-gl/dist/mapbox-gl.css";
 import maplibregl from "maplibre-gl";
 import React, { useEffect, useState } from "react";
-import { Map } from "react-map-gl";
-import chorus_data from "../InternetLayer";
+import { Map, useControl, NavigationControl } from "react-map-gl";
 import MapToolTip from "../components/MapToolTip";
 import Modal from "../components/Modal";
 import {WebMercatorViewport} from '@deck.gl/core';
@@ -18,12 +16,20 @@ import {intersect, booleanPointInPolygon, booleanIntersects, polygon, point, bbo
 import axios from 'axios'
 import { IconLayer } from "deck.gl";
 import {SimpleMeshLayer} from '@deck.gl/mesh-layers';
-import {OBJLoader} from '@loaders.gl/obj';
 import {_GeoJSONLoader} from '@loaders.gl/json';
 import {load} from '@loaders.gl/core';
+import {loadSuburbsAndLocalities } from '../data_parsers/SuburbsLocalities'
+import {getAirQuality, setAirQualityData} from '../data_parsers/AirQuality'
+import chorus_data from "../layers/InternetLayer";
+import { get_auckland_council_water_outages } from "../layers/WaterLayer";
+import WaterOutageMarkers from "../layers/WaterOutageMarkers";
+import { MapboxOverlay } from "@deck.gl/mapbox";
+import { WaterPipeLayer } from "../layers/WaterPipeLayer";
+import { FireHydrantLayer } from "../layers/FireHydrantLayer";
 
 // Source data GeoJSON
 const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
+const AIR_QUALITY_DATA_URL = './Air_Quality.geojson';
 
 const COLOR_SCALE = scaleThreshold()
   .domain([
@@ -79,41 +85,32 @@ const landCover = [
   ],
 ];
 
-const getFeatures = async () => {
-	const bbox = [
-		174.74103163875924,
-		-36.86561176914162,
-		174.78514718230426,
-		-36.83101520970452
-	];
-	const geojson = await axios.get("Water_Pipe.geojson")
-	const filtered = {...geojson.data, features: geojson.data.features.filter(feature => {
-		if (feature.geometry.type === "Point") {
-			return booleanPointInPolygon(point(feature.geometry.coordinates), bboxPolygon(bbox));
-		} else if (feature.geometry.type === "Polygon" || feature.type === "MultiPolygon") {
-			return booleanIntersects(polygon(feature.geometry.coordinates), bboxPolygon(bbox))
-		} else if (feature.geometry.type === "LineString") {
-			return booleanIntersects(lineString(feature.geometry.coordinates), bboxPolygon(bbox))
 
-		}
-		return false
-	})
+// Fetch air quality data once.
+fetch(AIR_QUALITY_DATA_URL)
+.then((response) => {
+	return response.json();
+})
+.then((json) => {
+	setAirQualityData(json);
+});
+
+export function DeckGLOverlay(props) {
+  const overlay = useControl(() => new MapboxOverlay(props));
+  overlay.setProps(props);
+  return null;
 }
-	console.log(filtered.features)
-}
-
-
-// getFeatures()
-
-function normalizeVector(vector) {
-	const magnitude = Math.sqrt(vector[0] * vector[0] + vector[1] * vector[1]);
-	return [vector[0] / magnitude, vector[1] / magnitude];
-  }
 
 export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   const [internetData, setInternetData] = useState();
+  const [waterOutageData, setWaterOutageData] = useState([]);
   const [hydrantData, setHydrantData] = useState()
-  const [waterPipeData, setWaterPipeData] = useState()
+  
+  useEffect(() => {
+    get_auckland_council_water_outages().then((data) =>
+      setWaterOutageData(data)
+    );
+  }, []);
 
 //   useEffect(() => {
 // 	console.log(getFeatures())
@@ -137,9 +134,6 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
 	(async () => {
 		const data = await load("Water_Hydrant_Central.geojson", _GeoJSONLoader)
 		setHydrantData(data);
-		const wpData =await load("Water_Pipe_Central.geojson", _GeoJSONLoader);
-		console.log(wpData)
-		setWaterPipeData({...(wpData), features: wpData.features.map(feature => buffer(feature, (feature.properties.NOM_DIA_MM || 10) * 5, {units: "millimeters"})).filter(f => !!f)})
 	})()
   }, []);
 
@@ -148,55 +142,7 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
     lightingEffect.shadowColor = [0, 0, 0, 0.5];
     return [lightingEffect];
   });
-  const layers = [
-    // only needed when using shadows - a plane for shadows to drop on
-    new PolygonLayer({
-      id: "ground",
-      data: landCover,
-      stroked: false,
-      getPolygon: (f) => f,
-      getFillColor: [0, 0, 0, 0],
-    }),
-    
-    new GeoJsonLayer({
-      id: "geojson2",
-      data: internetData,
-      opacity: 0.8,
-      stroked: false,
-      filled: true,
-      extruded: true,
-      wireframe: true,
-      getElevation: (f) => 0,
-      getFillColor: [255, 255, 255],
-      getLineColor: [255, 255, 255],
-      pickable: true,
-    }),
-	new SimpleMeshLayer({
-		id: 'fire-hydrant-layer',
-		data: hydrantData?.features || [],
-		loaders: [OBJLoader, _GeoJSONLoader],
-		getColor: d => [255, 0, 0, 255],
-		getOrientation: d => [0, 0, 80],
-		getPosition: d => { return d.geometry.coordinates},
-		mesh: 'fire-hydrant.obj',
-		sizeScale: 0.1,
-		
-		}),
-	
-	new GeoJsonLayer({
-		id: "geojson3",
-		data: waterPipeData?.features || [],
-		extruded: true,
-		getFillColor: [135,206,235, 200],
-		getLineColor: [135,206,235],
-		pickable: true,
-		stroked: false,
-		filled: true,
-		getElevation: (f) => f.properties.NOM_DIA_MM / 100,
-		// getLineWidth: (f) => f.properties.NOM_DIA_MM * 10 ,
-
-		}),
-  ];
+  
 
   const mapboxBuildingLayer = {
     id: "3d-buildings",
@@ -212,24 +158,56 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   };
 
   return (
-	<>
-	{/* <Modal/> */}
-    <DeckGL
-      layers={layers}
-      effects={effects}
-      initialViewState={INITIAL_VIEW_STATE}
-      controller={true}
-      getTooltip={() => MapToolTip()}
-    >
+    <div className="w-full h-full">
       <Map
+        style={{ width: "100vw", height: "100vh" }}
+        initialViewState={INITIAL_VIEW_STATE}
         reuseMaps
+        mapboxAccessToken="pk.eyJ1Ijoic3NuZXZlcmEiLCJhIjoiY2xsaHB4c3JoMWM2ZDNkcGtzOXJyemE4dCJ9.1OH8vr4265s8adq2s3fCuA"
         mapLib={maplibregl}
         mapStyle={mapStyle}
         preventStyleDiffing={true}
         onLoad={(e) => {
           e.target.addLayer(mapboxBuildingLayer);
+          loadSuburbsAndLocalities(e.target);
         }}
-      />
-    </DeckGL></>
+      >
+        <DeckGLOverlay
+          layers={[
+            new GeoJsonLayer({
+              id: "geojson2",
+              data: internetData,
+              opacity: 0.8,
+              stroked: false,
+              filled: true,
+              extruded: true,
+              wireframe: true,
+              getElevation: (f) => 0,
+              getFillColor: [255, 255, 255],
+              getLineColor: [255, 255, 255],
+              pickable: true,
+            }),
+			
+          ]}
+        />
+
+      	<WaterPipeLayer />
+		<FireHydrantLayer />
+        <DeckGLOverlay
+          layers={[
+            new PolygonLayer({
+              id: "ground",
+              data: landCover,
+              stroked: false,
+              getPolygon: (f) => f,
+              getFillColor: [0, 0, 0, 0],
+            }),
+          ]}
+        />
+
+        <WaterOutageMarkers outage_data={waterOutageData} />
+        <NavigationControl />
+      </Map>
+    </div>
   );
 }

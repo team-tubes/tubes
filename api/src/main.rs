@@ -1,4 +1,4 @@
-use std::env;
+#![allow(non_upper_case_globals)]
 
 use api::Api;
 use poem::{
@@ -6,13 +6,24 @@ use poem::{
     listener::TcpListener,
     EndpointExt, Route, Server,
 };
-use poem_openapi::OpenApiService;
+use poem_openapi::{OpenApiService, Tags};
+use proxy::Proxy;
 use rust_embed::RustEmbed;
-use sqlx::{postgres::PgPoolOptions, Connection};
+use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
+use std::env;
 
 mod api;
 mod data;
 mod database;
+mod proxy;
+mod templates;
+
+#[derive(Tags)]
+enum ApiTags {
+    #[oai(rename = "Complaints API")]
+    ComplaintsApi,
+    Proxise,
+}
 
 #[derive(RustEmbed)]
 #[folder = "static"]
@@ -26,21 +37,42 @@ async fn main() -> Result<(), std::io::Error> {
         std::env::set_var("RUST_LOG", "debug");
     }
 
-    let conn_str = env::var("DATABASE_URL").expect("Please set DATABASE_URL");
-    let conn = PgPoolOptions::new()
-        .connect(&conn_str)
-        .await
-        .expect("Could not connect to database");
-
     tracing_subscriber::fmt::init();
 
-    let api_service =
-        OpenApiService::new(Api, "Infra.nz", "1.0").server("http://localhost:3000/api");
+    let conn = if let Ok(conn_str) = env::var("DATABASE_URL") {
+        PgPoolOptions::new()
+            .connect(&conn_str)
+            .await
+            .expect("Could not connect to database")
+    } else if let Ok(socket) = env::var("DATABASE_URL") {
+        let database = env::var("DATABASE_URL").expect("Set database");
+        let options = PgConnectOptions::new().socket(socket).database(&database);
+
+        PgPoolOptions::new()
+            .connect_with(options)
+            .await
+            .expect("Could not connect to database")
+    } else {
+        panic!("Get good scrub");
+    };
+
+    let conn = sqlx::migrate!()
+        .run(&conn)
+        .await
+        .expect("Could not run migrations");
+
+    let api_service = OpenApiService::new((Api, Proxy::new()), "Infra.nz", "1.0")
+        .server("http://localhost:3000/api");
 
     let ui = api_service.swagger_ui();
     let spec = api_service.spec_endpoint();
+
     let app = Route::new()
         .at("/", EmbeddedFileEndpoint::<Files>::new("index.html"))
+        .at(
+            "/view_complaints",
+            EmbeddedFileEndpoint::<Files>::new("view_complaints.html"),
+        )
         .nest("/static", EmbeddedFilesEndpoint::<Files>::new())
         .nest("/api", api_service)
         .nest("/docs", ui)

@@ -2,7 +2,7 @@ use poem::{http::StatusCode, Error, FromRequest, Request, RequestBody, Result};
 use sqlx::PgPool;
 use tracing::error;
 
-use crate::data::Complaint;
+use crate::data::{Complaint, Location, Person};
 
 pub struct ComplaintsRepository(PgPool);
 
@@ -25,6 +25,42 @@ impl ComplaintsRepository {
         transaction.commit().await?;
 
         Ok(())
+    }
+
+    pub async fn get_complaints(
+        &self,
+        offset: u32,
+        limit: u32,
+    ) -> Result<Vec<Complaint>, sqlx::Error> {
+        let mut transaction = self.0.begin().await?;
+
+        let result = sqlx::query!(
+            "select * from complaints offset $1 limit $2",
+            offset as i64,
+            limit as i64
+        )
+        .fetch_all(&mut *transaction)
+        .await?;
+
+        transaction.commit().await?;
+        Ok(result
+            .into_iter()
+            .map(|x| Complaint {
+                id: x.id,
+                description: x.complaint,
+                location: Location {
+                    lat: x.lat,
+                    lng: x.lng,
+                    address: x.address,
+                },
+                person: Person {
+                    email: x.email,
+                    first_name: x.first_name,
+                    last_name: x.last_name,
+                    phone: x.phone,
+                },
+            })
+            .collect())
     }
 }
 

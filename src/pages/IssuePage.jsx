@@ -50,8 +50,8 @@ export default function IssuePage() {
 	};
 
 	return (
-		<div className="w-full flex justify-center">
-			<div className="container mx-auto px-2 md:px-36 flex justify-center flex-col items-center">
+		<div className="w-full max-w-[1600px] mx-auto">
+			<div className="  px-6  flex justify-center flex-col items-center">
 				<div className="h-12" />
 				<Search value={query} setValue={setQuery}/>
 				<IssueList issuesMap={search(outages)} />

@@ -9,17 +9,9 @@ import { scaleThreshold } from "d3-scale";
 import maplibregl from "maplibre-gl";
 import { useEffect, useState } from "react";
 import { Map, useControl, NavigationControl } from "react-map-gl";
-import MapToolTip from "../components/MapToolTip";
-import Modal from "../components/Modal";
-import {WebMercatorViewport} from '@deck.gl/core';
-import {intersect, booleanPointInPolygon, booleanIntersects, polygon, point, bboxPolygon, lineString,  buffer, getCoord, destination} from '@turf/turf'
-import axios from 'axios'
-import { IconLayer } from "deck.gl";
-import {SimpleMeshLayer} from '@deck.gl/mesh-layers';
-import {_GeoJSONLoader} from '@loaders.gl/json';
-import {load} from '@loaders.gl/core';
-import {loadSuburbsAndLocalities } from '../data_parsers/SuburbsLocalities'
-import {getAirQuality, setAirQualityData} from '../data_parsers/AirQuality'
+import { _GeoJSONLoader } from "@loaders.gl/json";
+import { load } from "@loaders.gl/core";
+import { getAirQuality } from "../data_parsers/AirQuality";
 
 import chorus_data from "../layers/InternetLayer";
 import { get_auckland_council_water_outages } from "../layers/WaterLayer";
@@ -27,7 +19,6 @@ import WaterOutageMarkers from "../layers/WaterOutageMarkers";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { WaterPipeLayer } from "../layers/WaterPipeLayer";
 import { FireHydrantLayer } from "../layers/FireHydrantLayer";
-import { getAirQuality } from "../data_parsers/AirQuality";
 
 // Source data GeoJSON
 const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
@@ -111,8 +102,8 @@ export function DeckGLOverlay(props) {
 export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   const [internetData, setInternetData] = useState();
   const [waterOutageData, setWaterOutageData] = useState([]);
-  const [hydrantData, setHydrantData] = useState()
-  
+  const [hydrantData, setHydrantData] = useState();
+
   const [suburbData, setSuburbData] = useState();
   const [airQualityData, setAirQualityData] = useState();
   useEffect(() => {
@@ -137,9 +128,9 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
       });
   }, []);
 
-//   useEffect(() => {
-// 	console.log(getFeatures())
-//   }, [])
+  //   useEffect(() => {
+  // 	console.log(getFeatures())
+  //   }, [])
   useEffect(() => {
     const asyncFn = async () => {
       const internet_geometry_data = await chorus_data();
@@ -153,13 +144,13 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
         features: internet_geometry_data,
       });
     };
-	
+
     asyncFn();
 
-	(async () => {
-		const data = await load("Water_Hydrant_Central.geojson", _GeoJSONLoader)
-		setHydrantData(data);
-	})()
+    (async () => {
+      const data = await load("Water_Hydrant_Central.geojson", _GeoJSONLoader);
+      setHydrantData(data);
+    })();
   }, []);
 
   const mapboxBuildingLayer = {
@@ -204,12 +195,11 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
               getLineColor: [255, 255, 255],
               pickable: true,
             }),
-			
           ]}
         />
 
-      	<WaterPipeLayer />
-		<FireHydrantLayer />
+        <WaterPipeLayer />
+        <FireHydrantLayer />
         <DeckGLOverlay
           layers={[
             new PolygonLayer({

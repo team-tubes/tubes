@@ -10,6 +10,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import maplibregl from 'maplibre-gl';
 import React, { useState } from 'react';
 import { Map } from 'react-map-gl';
+import chorus_data from '../InternetLayer';
+import MapToolTip from '../components/MapToolTip';
 
 // Source data GeoJSON
 const DATA_URL = './Water_Hydrant.geojson'; // eslint-disable-line
@@ -70,6 +72,7 @@ const landCover = [
 
 var geojsonData = [];
 
+
 fetch(DATA_URL)
 	.then((response) => {
 		return response.json();
@@ -78,7 +81,14 @@ fetch(DATA_URL)
 		geojsonData = json;
 	});
 
+const internet_geometry_data = await chorus_data()
+
+const internet_data = 	{type: "FeatureCollection", name:'Internet Layer', crs: {properties: {name: 'urn:ogc:def:crs:OGC:1.3:CRS84'},type: "name"}, features: internet_geometry_data }
+
+
+
 export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
+
 	const [effects] = useState(() => {
 		const lightingEffect = new LightingEffect({ ambientLight, dirLight });
 		lightingEffect.shadowColor = [0, 0, 0, 0.5];
@@ -107,8 +117,22 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
 			getLineColor: [255, 255, 255],
 			pickable: true,
 		}),
+		new GeoJsonLayer({
+			id: 'geojson2',
+			data:internet_data,
+			opacity: 0.8,
+			stroked: false,
+			filled: true,
+			extruded: true,
+			wireframe: true,
+			getElevation: (f) => 0,
+			getFillColor: [255, 255, 255],
+			getLineColor: [255, 255, 255],
+			pickable: true,
+		}),
 	];
 
+	
 	const mapboxBuildingLayer = {
 		id: '3d-buildings',
 		source: 'carto',
@@ -128,12 +152,15 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
 			effects={effects}
 			initialViewState={INITIAL_VIEW_STATE}
 			controller={true}
+			getTooltip = {()=>MapToolTip()}
+			
 		>
 			<Map
 				reuseMaps
 				mapLib={maplibregl}
 				mapStyle={mapStyle}
 				preventStyleDiffing={true}
+				
 				onLoad={(e) => {
 					e.target.addLayer(mapboxBuildingLayer);
 				}}

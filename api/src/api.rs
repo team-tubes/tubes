@@ -1,20 +1,18 @@
 use crate::{
     data::{Complaint, Location, Person},
     database::ComplaintsRepository,
-    templates,
+    templates, ApiTags,
 };
 use poem::{error::ResponseError, http::StatusCode, web::Accept, Error, Result};
 use poem_openapi::{
-    param::{Header, Query},
+    param::Query,
     payload::{Form, Html, Json},
     types::ToJSON,
     ApiResponse, Object, OpenApi, ResponseContent,
-    __private::mime::Mime,
 };
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, NoneAsEmptyString};
 use tracing::error;
-use tracing_subscriber::fmt::format::Compact;
 
 #[serde_as]
 #[derive(Deserialize, Serialize, Debug, Object)]
@@ -70,10 +68,6 @@ enum GetComplaint {
     #[oai(status = 200)]
     /// When a complaint has been successfully submitted
     Success(Html<String>),
-
-    #[oai(status = 501)]
-    /// I forgor to do it 💀
-    Todo,
 }
 
 impl ResponseError for GetComplaint {
@@ -96,7 +90,7 @@ enum GetResponseResult {
 
 pub struct Api;
 
-#[OpenApi]
+#[OpenApi(tag = "ApiTags::ComplaintsApi")]
 impl Api {
     #[oai(path = "/complaints", method = "post")]
     async fn create_complaint(

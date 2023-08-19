@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://unpkg.com/htmx.org@1.9.4"
+      integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV"
+      crossorigin="anonymous"
+    ></script>
+
+    <title>infra.nz | Public complaint form</title>
+  </head>
+  <body>
+    <form
+      hx-get="/api/complaints"
+      hx-swap="innerHTML"
+      hx-target="#result"
+      hx-params="*"
+      hx-headers='{"Accept": "text/html"}'
+    >
+      <label for="offset">Offset: </label>
+      <input type="number" name="offset" id="offset" value="0" />
+      <label for="offset">Limit: </label>
+      <input type="number" name="limit" id="limit" value="25" />
+
+      <input type="submit" value="Submit" />
+    </form>
+
+    <div id="result"></div>
+  </body>
+</html>

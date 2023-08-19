@@ -4,6 +4,7 @@ import MapPage from './pages/MapPage';
 import IssuePage from './pages/IssuePage';
 import ReportPage from './pages/ReportPage';
 import IssueDetailPage from './pages/IssueDetailPage';
+import "mapbox-gl/dist/mapbox-gl.css";
 
 export default function App() {
 	return (

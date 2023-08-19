@@ -1,5 +1,5 @@
 import { Marker, Popup } from "react-map-gl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { format, parseISO, intervalToDuration } from "date-fns";
 import { GeoJsonLayer } from "deck.gl";
 import { DeckGLOverlay } from "../pages/MapPage";
@@ -13,33 +13,51 @@ export const WaterPipeLayer = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [selectedPipe, setSelectedPipe] = useState()
   const [coordinates, setCoordinates] = useState()
+  const [timerValue, setTimerValue] = useState(1);
+  const [animation] = useState({});
+  const incrementingRef = useRef(true)
+  const startBlue = [144,222,255];
+  const endBlue = [1,155,220];
+  const animate = () => {
+    setTimerValue(prevValue => {
+      const newValue = incrementingRef.current ? prevValue + 1 : prevValue - 1;
+      if (newValue >= 100) incrementingRef.current = false
+      else if (newValue <= 1) incrementingRef.current = true
+      return newValue;
+    });
+    animation.id = window.requestAnimationFrame(animate);
+  }
+  useEffect(() => {
+    animation.id = window.requestAnimationFrame(animate);
+    return () => window.cancelAnimationFrame(animation.id);
+  }, [animation]);
+
   useEffect(() => {
 	(async () => {
 		const wpData = await load("Water_Pipe_Central.geojson", _GeoJSONLoader);
 		setWaterPipeData({...(wpData), features: wpData.features.map(feature => buffer(feature, (feature.properties.NOM_DIA_MM || 10) * 5, {units: "millimeters"})).filter(f => !!f)})
 	})()
   }, []);
-
   return (
     <>
-    <DeckGLOverlay
-          layers={[
-           
-			
-			new GeoJsonLayer({
-				id: "geojson3",
-				data: waterPipeData?.features || [],
-				extruded: true,
-				getFillColor: [135,206,235, 200],
-				getLineColor: [135,206,235],
-				pickable: true,
-				stroked: false,
-				filled: true,
-				getElevation: (f) => f.properties.NOM_DIA_MM / 100,
-				// getLineWidth: (f) => f.properties.NOM_DIA_MM * 10 ,
-        onClick: e => {console.log(e);setCoordinates(e.coordinate); setIsPopupOpen(true); setSelectedPipe(e.object)}
-				}),
-      ]}
+        <DeckGLOverlay
+          layers={[	
+          new GeoJsonLayer({
+            id: "geojson3",
+            data: waterPipeData?.features || [],
+            extruded: true,
+            getFillColor: (f) => startBlue.map((color, index) => Math.round(color + (endBlue[index] - color) * ((timerValue * f.properties.NOM_DIA_MM / 500) / 100))),
+            pickable: true,
+            stroked: false,
+            filled: true,
+            lineJointRounded: true,
+            getElevation: (f) => f.properties.NOM_DIA_MM / 100,
+            
+            updateTriggers: {getFillColor: [timerValue]},
+            // getLineWidth: (f) => f.properties.NOM_DIA_MM * 10 ,
+            onClick: e => {setCoordinates(e.coordinate); setIsPopupOpen(true); setSelectedPipe(e.object)}
+            }),
+          ]}
         />
       
         {isPopupOpen && (

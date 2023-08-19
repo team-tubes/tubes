@@ -6,7 +6,7 @@ function format_chorus_api_data(data) {
   const formattedData = data.reduce(
     (acc, { sites, ...rest }) => [
       ...acc,
-      ...sites.map((site) => ({
+      ...sites.slice(0, 1).map((site) => ({ // designed to support more, but only one to stop z fighting
         ...rest,
         ...site,
         type: "Feature",

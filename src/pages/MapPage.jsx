@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 import { Map, useControl, NavigationControl } from "react-map-gl";
 import { _GeoJSONLoader } from "@loaders.gl/json";
 import { load } from "@loaders.gl/core";
-import { getAirQuality } from "../data_parsers/AirQuality";
 
 import { get_auckland_council_water_outages } from "../layers/WaterLayer";
 import WaterOutageMarkers from "../layers/WaterOutageMarkers";
@@ -19,10 +18,10 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import { WaterPipeLayer } from "../layers/WaterPipeLayer";
 import { FireHydrantLayer } from "../layers/FireHydrantLayer";
 import { InternetLayer } from "../layers/InternetLayer";
+import { SuburbAirQualityLayer } from "../layers/SuburbAirQualityLayer";
 
 // Source data GeoJSON
 const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
-const AIR_QUALITY_DATA_URL = "./Air_Quality.geojson";
 
 const COLOR_SCALE = scaleThreshold()
   .domain([
@@ -102,27 +101,10 @@ export function DeckGLOverlay(props) {
 export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   const [waterOutageData, setWaterOutageData] = useState([]);
 
-  const [suburbData, setSuburbData] = useState();
-  const [airQualityData, setAirQualityData] = useState();
   useEffect(() => {
     get_auckland_council_water_outages().then((data) =>
       setWaterOutageData(data)
     );
-    fetch("./SuburbBorders.geojson")
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setSuburbData(data);
-      });
-
-    fetch(AIR_QUALITY_DATA_URL)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setAirQualityData(data);
-      });
   }, []);
 
   const mapboxBuildingLayer = {
@@ -163,53 +145,8 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
             }),
           ]}
         />
-        {airQualityData && (
-          <DeckGLOverlay
-            layers={[
-              new GeoJsonLayer({
-                id: "suburbGeo",
-                data: suburbData,
-                opacity: 0.1,
-                stroked: true,
-                filled: true,
-                extruded: false,
-                wireframe: false,
-                getElevation: (f) => Math.random(),
-                getFillColor: (d) => {
-                  const sumLatLng = d.geometry.coordinates[0].reduce(
-                    (acc, curr) => ({
-                      lng: acc.lng + curr[0],
-                      lat: acc.lat + curr[1],
-                    }),
-                    { lng: 0, lat: 0 }
-                  );
-                  const avgLatLng = {
-                    lat: sumLatLng.lat / d.geometry.coordinates[0].length,
-                    lng: sumLatLng.lng / d.geometry.coordinates[0].length,
-                  };
-                  const airQ = getAirQuality(
-                    airQualityData,
-                    avgLatLng.lng,
-                    avgLatLng.lat
-                  );
-
-                  const con = airQ.Concentration;
-
-                  const normal = Math.min(
-                    Math.max(0, (con - 6.5) / (14.1 - 6.5)),
-                    1
-                  );
-                  const val = 255 * normal;
-                  return [val, 0, 255 * (1 - normal), 70];
-                },
-                getLineColor: [0, 0, 0, 170],
-                getLineWidth: 1,
-                lineWidthScale: 3,
-                pickable: true,
-              }),
-            ]}
-          />
-        )}
+        
+        <SuburbAirQualityLayer/>
         <InternetLayer />
         <WaterPipeLayer />
         <FireHydrantLayer />

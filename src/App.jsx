@@ -3,6 +3,7 @@ import MainLayout from './pages/MainLayout';
 import MapPage from './pages/MapPage';
 import IssuePage from './pages/IssuePage';
 import ReportPage from './pages/ReportPage';
+import "mapbox-gl/dist/mapbox-gl.css";
 
 export default function App() {
 	return (

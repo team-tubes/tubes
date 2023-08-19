@@ -6,12 +6,12 @@ import {
 import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
 import { scaleThreshold } from "d3-scale";
-import "mapbox-gl/dist/mapbox-gl.css";
 import maplibregl from "maplibre-gl";
 import React, { useEffect, useState } from "react";
-import { Map, useControl } from "react-map-gl";
+import { Map, useControl, NavigationControl } from "react-map-gl";
 import MapToolTip from "../components/MapToolTip";
 import chorus_data from "../layers/InternetLayer";
+import { get_auckland_council_water_outages } from "../layers/WaterLayer";
 import WaterOutageMarkers from "../layers/WaterOutageMarkers";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 
@@ -80,6 +80,13 @@ function DeckGLOverlay(props) {
 
 export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   const [internetData, setInternetData] = useState();
+  const [waterOutageData, setWaterOutageData] = useState([]);
+
+  useEffect(() => {
+    get_auckland_council_water_outages().then((data) =>
+      setWaterOutageData(data)
+    );
+  }, []);
 
   useEffect(() => {
     const asyncFn = async () => {
@@ -117,15 +124,12 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   };
 
   return (
-    <DeckGL
-      layers={[]}
-      effects={effects}
-      initialViewState={INITIAL_VIEW_STATE}
-      controller={true}
-      getTooltip={() => MapToolTip()}
-    >
+    <div className="w-full h-full">
       <Map
+        style={{ width: "100vw", height: "100vh" }}
+        initialViewState={INITIAL_VIEW_STATE}
         reuseMaps
+        mapboxAccessToken="pk.eyJ1Ijoic3NuZXZlcmEiLCJhIjoiY2xsaHB4c3JoMWM2ZDNkcGtzOXJyemE4dCJ9.1OH8vr4265s8adq2s3fCuA"
         mapLib={maplibregl}
         mapStyle={mapStyle}
         preventStyleDiffing={true}
@@ -137,7 +141,7 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
           layers={[
             new GeoJsonLayer({
               id: "geojson2",
-              data: internet_data,
+              data: internetData,
               opacity: 0.8,
               stroked: false,
               filled: true,
@@ -173,7 +177,6 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
           layers={[
             new PolygonLayer({
               id: "ground",
-
               data: landCover,
               stroked: false,
               getPolygon: (f) => f,
@@ -182,11 +185,9 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
           ]}
         />
 
-        <WaterOutageMarkers
-          style={{ zIndex: 1000 }}
-          outage_data={water_marker_data}
-        />
+        <WaterOutageMarkers outage_data={waterOutageData} />
+        <NavigationControl />
       </Map>
-    </DeckGL>
+    </div>
   );
 }

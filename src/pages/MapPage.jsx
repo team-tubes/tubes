@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import { Map } from "react-map-gl";
 import chorus_data from "../InternetLayer";
 import MapToolTip from "../components/MapToolTip";
+import Modal from "../components/Modal";
 
 // Source data GeoJSON
 const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
@@ -146,6 +147,8 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   };
 
   return (
+	<>
+	<Modal/>
     <DeckGL
       layers={layers}
       effects={effects}
@@ -162,6 +165,6 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
           e.target.addLayer(mapboxBuildingLayer);
         }}
       />
-    </DeckGL>
+    </DeckGL></>
   );
 }

@@ -3,7 +3,7 @@ function MapToolTip()
    
     return (
     {
-        html: '<p>afasgsagg</p>',
+        html: '<p></p>',
         style: {
         backgroundColor: 'white',
         color: 'black',

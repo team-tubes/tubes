@@ -3,16 +3,16 @@ import {
   LightingEffect,
   _SunLight as SunLight,
 } from "@deck.gl/core";
-import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
 import { scaleThreshold } from "d3-scale";
 import "mapbox-gl/dist/mapbox-gl.css";
 import maplibregl from "maplibre-gl";
 import React, { useEffect, useState } from "react";
 import { Map } from "react-map-gl";
-import chorus_data from "../InternetLayer";
 import MapToolTip from "../components/MapToolTip";
 import Modal from "../components/Modal";
+import { GeoJsonLayer, PolygonLayer } from '@deck.gl/layers';
+import chorus_data from '../layers/InternetLayer';
 
 // Source data GeoJSON
 const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
@@ -133,38 +133,32 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
     }),
   ];
 
-  const mapboxBuildingLayer = {
-    id: "3d-buildings",
-    source: "carto",
-    "source-layer": "building",
-    type: "fill-extrusion",
-    minzoom: 0,
-    paint: {
-      "fill-extrusion-color": "rgb(245, 242, 235)",
-      "fill-extrusion-opacity": 0.4,
-      "fill-extrusion-height": ["get", "render_height"],
-    },
-  };
-
-  return (
-	<>
-	<Modal/>
-    <DeckGL
-      layers={layers}
-      effects={effects}
-      initialViewState={INITIAL_VIEW_STATE}
-      controller={true}
-      getTooltip={() => MapToolTip()}
-    >
-      <Map
-        reuseMaps
-        mapLib={maplibregl}
-        mapStyle={mapStyle}
-        preventStyleDiffing={true}
-        onLoad={(e) => {
-          e.target.addLayer(mapboxBuildingLayer);
-        }}
-      />
-    </DeckGL></>
-  );
+	return (
+		<DeckGL
+			layers={layers}
+			effects={effects}
+			initialViewState={INITIAL_VIEW_STATE}
+			controller={true}
+			getTooltip = {()=>MapToolTip()}
+			
+			
+		>
+			<Map
+				onClick={(e)=>console.log("ASgdsgd")}
+				reuseMaps
+				mapLib={maplibregl}
+				mapStyle={mapStyle}
+				preventStyleDiffing={true}
+				style={{zIndex:"100"}}
+				
+				onLoad={(e) => {
+					e.target.addLayer(mapboxBuildingLayer);
+				}}
+			>
+			<WaterOutageMarkers style={{zIndex:1000}} outage_data={water_marker_data}/>
+			
+			</Map>
+			
+		</DeckGL>
+	);
 }

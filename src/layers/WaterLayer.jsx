@@ -15,9 +15,7 @@ export async function get_auckland_council_water_outages() {
 
 function get_water_outage_data_specific(outage_id) {
   //Get all outages
-  return fetch(
-    "https://api.infra.nz/api/watercare/" + outage_id
-  )
+  return fetch("https://api.infra.nz/api/watercare/" + outage_id)
     .then((response) => response.json())
     .then((data) => {
       return data;

@@ -10,6 +10,8 @@ import maplibregl from "maplibre-gl";
 import React, { useEffect, useState } from "react";
 import { Map, useControl, NavigationControl } from "react-map-gl";
 import MapToolTip from "../components/MapToolTip";
+import {loadSuburbsAndLocalities } from '../data_parsers/SuburbsLocalities'
+import {getAirQuality, setAirQualityData} from '../data_parsers/AirQuality'
 import chorus_data from "../layers/InternetLayer";
 import { get_auckland_council_water_outages } from "../layers/WaterLayer";
 import WaterOutageMarkers from "../layers/WaterOutageMarkers";
@@ -17,6 +19,7 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 
 // Source data GeoJSON
 const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
+const AIR_QUALITY_DATA_URL = './Air_Quality.geojson';
 
 const COLOR_SCALE = scaleThreshold()
   .domain([
@@ -71,6 +74,16 @@ const landCover = [
     [-123.306, 49.196],
   ],
 ];
+
+
+// Fetch air quality data once.
+fetch(AIR_QUALITY_DATA_URL)
+.then((response) => {
+	return response.json();
+})
+.then((json) => {
+	setAirQualityData(json);
+});
 
 function DeckGLOverlay(props) {
   const overlay = useControl(() => new MapboxOverlay(props));
@@ -135,6 +148,7 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
         preventStyleDiffing={true}
         onLoad={(e) => {
           e.target.addLayer(mapboxBuildingLayer);
+          loadSuburbsAndLocalities(e.target);
         }}
       >
         <DeckGLOverlay

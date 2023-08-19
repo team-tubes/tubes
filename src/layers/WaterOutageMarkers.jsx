@@ -90,5 +90,3 @@ const WaterOutageMarker = (outage) => {
     </>
   );
 };
-
-export default WaterOutageMarkers;

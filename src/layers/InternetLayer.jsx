@@ -4,7 +4,6 @@ import { format, fromUnixTime } from "date-fns";
 import { GeoJsonLayer } from "deck.gl";
 import { DeckGLOverlay } from "../pages/MapPage";
 import { _GeoJSONLoader } from "@loaders.gl/json";
-import chorus_data from "./InternetSource";
 
 export const InternetLayer = () => {
   const [internetData, setInternetData] = useState();
@@ -14,11 +13,10 @@ export const InternetLayer = () => {
 
   useEffect(() => {
     (async () => {
-      const internet_geometry_data = await chorus_data();
       setInternetData({
         type: "FeatureCollection",
         name: "Internet Layer",
-        features: internet_geometry_data,
+        features: await fetch_chorus_api_data(),
       });
     })();
   }, []);
@@ -93,3 +91,30 @@ export const InternetLayer = () => {
     </>
   );
 };
+
+function format_chorus_api_data(data) {
+  const formattedData = data.reduce(
+    (acc, { sites, ...rest }) => [
+      ...acc,
+      ...sites.slice(0, 1).map((site) => ({ // designed to support more, but only one to stop z fighting
+        ...rest,
+        ...site,
+        type: "Feature",
+        geometry: JSON.parse(site.poly),
+      })),
+    ],
+    []
+  );
+
+  return formattedData;
+}
+
+async function fetch_chorus_api_data() {
+  return fetch("https://api.infra.nz/api/chorus")
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      return format_chorus_api_data(json);
+    });
+}

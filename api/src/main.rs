@@ -3,14 +3,16 @@
 use api::Api;
 use poem::{
     endpoint::{EmbeddedFileEndpoint, EmbeddedFilesEndpoint},
-    listener::TcpListener,
+    listener::{Listener, RustlsCertificate, RustlsConfig, TcpListener},
+    middleware::Cors,
     EndpointExt, Route, Server,
 };
 use poem_openapi::{OpenApiService, Tags};
 use proxy::Proxy;
+use reqwest::Method;
 use rust_embed::RustEmbed;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
-use std::env;
+use std::{env, fs};
 
 mod api;
 mod data;
@@ -24,6 +26,12 @@ enum ApiTags {
     ComplaintsApi,
     Proxise,
 }
+
+#[cfg(debug_assertions)]
+const SERVER: &str = "http://localhost:3000/api";
+
+#[cfg(not(debug_assertions))]
+const SERVER: &str = "https://api.infra.nz/api";
 
 #[derive(RustEmbed)]
 #[folder = "static"]
@@ -56,13 +64,12 @@ async fn main() -> Result<(), std::io::Error> {
         panic!("Get good scrub");
     };
 
-    let conn = sqlx::migrate!()
+    sqlx::migrate!()
         .run(&conn)
         .await
         .expect("Could not run migrations");
 
-    let api_service = OpenApiService::new((Api, Proxy::new()), "Infra.nz", "1.0")
-        .server("http://localhost:3000/api");
+    let api_service = OpenApiService::new((Api, Proxy::new()), "Infra.nz", "1.0").server(SERVER);
 
     let ui = api_service.swagger_ui();
     let spec = api_service.spec_endpoint();
@@ -77,9 +84,40 @@ async fn main() -> Result<(), std::io::Error> {
         .nest("/api", api_service)
         .nest("/docs", ui)
         .nest("/spec.json", spec)
+        .with(
+            Cors::new()
+                .allow_methods([Method::GET, Method::POST])
+                .allow_origins_fn(|_| true),
+        )
         .data(conn);
 
-    Server::new(TcpListener::bind("127.0.0.1:3000"))
-        .run(app)
-        .await
+    match (env::var("PUBLIC_KEY"), env::var("PRIVATE_KEY")) {
+        (Ok(public_key), Ok(private_key)) => {
+            Server::new(
+                TcpListener::bind("0.0.0.0:443")
+                    .rustls(
+                        RustlsConfig::new().fallback(
+                            RustlsCertificate::new()
+                                .key(
+                                    fs::read_to_string(private_key)
+                                        .expect("Could not read private key file"),
+                                )
+                                .cert(
+                                    fs::read_to_string(public_key)
+                                        .expect("Could not read public key file"),
+                                ),
+                        ),
+                    )
+                    .combine(TcpListener::bind("0.0.0.0:80")),
+            )
+            .run(app)
+            .await
+        }
+
+        _ => {
+            Server::new(TcpListener::bind("0.0.0.0:3000"))
+                .run(app)
+                .await
+        }
+    }
 }

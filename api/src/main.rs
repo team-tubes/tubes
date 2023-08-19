@@ -13,6 +13,7 @@ use sqlx::{postgres::PgPoolOptions, Connection};
 mod api;
 mod data;
 mod database;
+mod templates;
 
 #[derive(RustEmbed)]
 #[folder = "static"]
@@ -41,6 +42,10 @@ async fn main() -> Result<(), std::io::Error> {
     let spec = api_service.spec_endpoint();
     let app = Route::new()
         .at("/", EmbeddedFileEndpoint::<Files>::new("index.html"))
+        .at(
+            "/view_complaints",
+            EmbeddedFileEndpoint::<Files>::new("view_complaints.html"),
+        )
         .nest("/static", EmbeddedFilesEndpoint::<Files>::new())
         .nest("/api", api_service)
         .nest("/docs", ui)

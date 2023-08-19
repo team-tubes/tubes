@@ -1,15 +1,20 @@
 use crate::{
     data::{Complaint, Location, Person},
     database::ComplaintsRepository,
+    templates,
 };
-use poem::{error::ResponseError, http::StatusCode, Error, Result};
+use poem::{error::ResponseError, http::StatusCode, web::Accept, Error, Result};
 use poem_openapi::{
-    payload::{Form, Html},
-    ApiResponse, Object, OpenApi,
+    param::{Header, Query},
+    payload::{Form, Html, Json},
+    types::ToJSON,
+    ApiResponse, Object, OpenApi, ResponseContent,
+    __private::mime::Mime,
 };
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, NoneAsEmptyString};
 use tracing::error;
+use tracing_subscriber::fmt::format::Compact;
 
 #[serde_as]
 #[derive(Deserialize, Serialize, Debug, Object)]
@@ -76,11 +81,24 @@ impl ResponseError for GetComplaint {
         StatusCode::NOT_IMPLEMENTED
     }
 }
+
+#[derive(ResponseContent)]
+pub enum HtmlPossibleResponse<T: ToJSON + Send + Sync + Serialize> {
+    Json(Json<T>),
+    Html(Html<String>),
+}
+
+#[derive(ApiResponse)]
+enum GetResponseResult {
+    #[oai(status = 200)]
+    Ok(HtmlPossibleResponse<Vec<Complaint>>),
+}
+
 pub struct Api;
 
 #[OpenApi]
 impl Api {
-    #[oai(path = "/complaint", method = "post")]
+    #[oai(path = "/complaints", method = "post")]
     async fn create_complaint(
         &self,
         data: Form<PostComplaintParams>,
@@ -98,4 +116,41 @@ impl Api {
             "<p>Successfully submitted complaint</p>".into(),
         )))
     }
+
+    #[oai(path = "/complaints", method = "get")]
+    async fn get_complaints(
+        &self,
+        #[oai(default = "default_limit")] limit: Query<u32>,
+        #[oai(default = "default_offset")] offset: Query<u32>,
+        complaint_repo: ComplaintsRepository,
+        accept: Accept,
+    ) -> Result<GetResponseResult> {
+        let complaints = complaint_repo
+            .get_complaints(offset.0, limit.0)
+            .await
+            .map_err(|err| {
+                error!("Error getting complaints: {err}");
+                Error::from_status(StatusCode::INTERNAL_SERVER_ERROR)
+            })?;
+
+        match accept.0.first().map(|l| l.as_ref()) {
+            Some("text/html") => Ok(GetResponseResult::Ok(HtmlPossibleResponse::Html(Html(
+                templates::render_complaints(complaints).map_err(|err| {
+                    error!("Error rendering complaints template: {err:?}");
+                    Error::from_status(StatusCode::INTERNAL_SERVER_ERROR)
+                })?,
+            )))),
+            Some("application/json") | _ => Ok(GetResponseResult::Ok(HtmlPossibleResponse::Json(
+                Json(complaints),
+            ))),
+        }
+    }
+}
+
+fn default_limit() -> u32 {
+    25
+}
+
+fn default_offset() -> u32 {
+    0
 }

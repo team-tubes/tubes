@@ -12,7 +12,7 @@ import { bbox } from 'turf'
 
 // Source data GeoJSON
 const DATA_URL =
-  './suburbs.geojson'; // eslint-disable-line
+  './tubes-data/suburbs.geojson'; // eslint-disable-line
 
 const COLOR_SCALE = scaleThreshold()
   .domain([-0.6, -0.45, -0.3, -0.15, 0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1.05, 1.2])

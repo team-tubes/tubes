@@ -1,0 +1,3 @@
+[submodule "public/tubes-data"]
+	path = public/tubes-data
+	url = git@github.com:team-tubes/tubes-data.git

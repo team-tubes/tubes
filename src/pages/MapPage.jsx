@@ -13,12 +13,12 @@ import { _GeoJSONLoader } from "@loaders.gl/json";
 import { load } from "@loaders.gl/core";
 import { getAirQuality } from "../data_parsers/AirQuality";
 
-import chorus_data from "../layers/InternetLayer";
 import { get_auckland_council_water_outages } from "../layers/WaterLayer";
 import WaterOutageMarkers from "../layers/WaterOutageMarkers";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { WaterPipeLayer } from "../layers/WaterPipeLayer";
 import { FireHydrantLayer } from "../layers/FireHydrantLayer";
+import { InternetLayer } from "../layers/InternetLayer";
 
 // Source data GeoJSON
 const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
@@ -100,9 +100,7 @@ export function DeckGLOverlay(props) {
 }
 
 export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
-  const [internetData, setInternetData] = useState();
   const [waterOutageData, setWaterOutageData] = useState([]);
-  const [hydrantData, setHydrantData] = useState();
 
   const [suburbData, setSuburbData] = useState();
   const [airQualityData, setAirQualityData] = useState();
@@ -123,34 +121,8 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
         return response.json();
       })
       .then((data) => {
-        console.log({ data });
         setAirQualityData(data);
       });
-  }, []);
-
-  //   useEffect(() => {
-  // 	console.log(getFeatures())
-  //   }, [])
-  useEffect(() => {
-    const asyncFn = async () => {
-      const internet_geometry_data = await chorus_data();
-      setInternetData({
-        type: "FeatureCollection",
-        name: "Internet Layer",
-        crs: {
-          properties: { name: "urn:ogc:def:crs:OGC:1.3:CRS84" },
-          type: "name",
-        },
-        features: internet_geometry_data,
-      });
-    };
-
-    asyncFn();
-
-    (async () => {
-      const data = await load("Water_Hydrant_Central.geojson", _GeoJSONLoader);
-      setHydrantData(data);
-    })();
   }, []);
 
   const mapboxBuildingLayer = {
@@ -180,24 +152,6 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
           e.target.addLayer(mapboxBuildingLayer);
         }}
       >
-        <DeckGLOverlay
-          layers={[
-            new GeoJsonLayer({
-              id: "geojson2",
-              data: internetData,
-              opacity: 0.8,
-              stroked: false,
-              filled: true,
-              extruded: true,
-              wireframe: true,
-              getElevation: (f) => 0,
-              getFillColor: [255, 255, 255],
-              getLineColor: [255, 255, 255],
-              pickable: true,
-            }),
-          ]}
-        />
-
         <WaterPipeLayer />
         <FireHydrantLayer />
         <DeckGLOverlay
@@ -222,7 +176,7 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
                 filled: true,
                 extruded: false,
                 wireframe: false,
-                getElevation: (f) => 0,
+                getElevation: (f) => Math.random(),
                 getFillColor: (d) => {
                   const sumLatLng = d.geometry.coordinates[0].reduce(
                     (acc, curr) => ({
@@ -248,21 +202,17 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
                     1
                   );
                   const val = 255 * normal;
-                  return [val, 0, 255 * (1 - normal)];
+                  return [val, 0, 255 * (1 - normal), 70];
                 },
-                getLineColor: [0, 0, 0],
+                getLineColor: [0, 0, 0, 170],
                 getLineWidth: 1,
-                lineWidthScale: 20,
-                lineWidthMinPixels: 2,
+                lineWidthScale: 3,
                 pickable: true,
-
-                onClick: (d) => {
-                  console.log({ d });
-                },
               }),
             ]}
           />
         )}
+        <InternetLayer />
 
         <WaterOutageMarkers outage_data={waterOutageData} />
         <NavigationControl />

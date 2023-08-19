@@ -1,5 +1,36 @@
 import React, { useContext, useRef, useState } from "react";
 import { AppContext } from "../context/AppContextProvider";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { z } from "zod";
+import { toFormikValidate, toFormikValidationSchema } from "zod-formik-adapter";
+
+const schema = z.object({
+  fname: z.string({
+    required_error: "Please enter your first name",
+  }),
+  lname: z.string({
+    required_error: "Please enter your last name",
+  }),
+  email: z
+    .string({
+      required_error: "Please enter your email",
+    })
+    .email({
+      message: "Invalid email",
+    }),
+  lat: z.number({
+    required_error: "Please specify a latitude",
+  }),
+  lng: z.number({
+    required_error: "Please specify a longitude",
+  }),
+  description: z.string({
+    required_error: "Please describe the issue",
+  }),
+  address: z.string().optional(),
+  phone_country: z.number().optional(),
+  phone: z.number().optional(),
+});
 
 export default function ReportPage() {
   const { issues, loading } = useContext(AppContext);
@@ -8,12 +39,18 @@ export default function ReportPage() {
   const [lat, setLat] = useState();
   const [lng, setLng] = useState();
 
-  navigator.geolocation.getCurrentPosition((pos) => {
-    setLat(pos.coords.latitude);
-    setLng(pos.coords.longitude);
-  });
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      setLat(pos.coords.latitude);
+      setLng(pos.coords.longitude);
+    },
+    () => {
+      setLat("set");
+      setLng("set");
+    }
+  );
 
-  if (loading) return <div>loading...</div>;
+  if (loading || !lat || !lng) return <div>loading...</div>;
 
   return (
     <div className="w-full max-w-[1600px] mx-auto">
@@ -26,151 +63,200 @@ export default function ReportPage() {
             </h6>
             <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
             <div className="my-2">
-              <div className="grid lg:grid-cols-2 gap-x-10 my-2">
-                <label
-                  htmlFor="fname"
-                  className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
-                >
-                  First Name
-                </label>
+              <Formik
+                validate={toFormikValidate(schema)}
+                initialValues={{
+                  lat: lat != "set" ? lat : undefined,
+                  lng: lng != "set" ? lng : lng,
+                }}
+                onSubmit={async (values) => {
+                  let data = new URLSearchParams(values);
 
-                <input
-                  type="text"
-                  id="fname"
-                  className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
-                  placeholder=""
-                  required
-                />
+                  let resp = await fetch(
+                    "https://api.infra.nz/api/complaints",
+                    {
+                      method: "POST",
+                      headers: {
+                        "content-type": "application/x-www-form-urlencoded",
+                      },
+                      body: data,
+                    }
+                  );
 
-                <label
-                  htmlFor="lname"
-                  className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
-                >
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  id="lname"
-                  className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
-                  placeholder=""
-                  required
-                />
-              </div>
+                  if (resp.status != 200) {
+                    alert("Error submitting form " + (await resp.text()));
+                  } else {
+                    alert("Success");
+                  }
 
-              <div className="h-8"></div>
-              <label
-                className="mt-8 font-medium my-2 text-sm md:text-md text-gray-200"
-                htmlFor="email"
+                  console.log(values);
+                }}
               >
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                className="block bg-neutral-800 w-full p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md min-w-[500px] rounded-lg "
-                placeholder="example@example.com"
-                required
-              />
+                <Form>
+                  <div className="grid lg:grid-cols-2 gap-x-10 my-2">
+                    <label
+                      htmlFor="fname"
+                      className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
+                    >
+                      First Name
+                    </label>
 
-              <div className="h-8"></div>
-              <label
-                className="mt-8 font-medium my-2 text-sm md:text-md text-gray-200"
-                htmlFor="address"
-              >
-                Address
-              </label>
-              <input
-                type="text"
-                id="address"
-                className="block bg-neutral-800 w-full p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md min-w-[500px] rounded-lg "
-                placeholder="E.g. 27D Te Waerenga Rd, Hamurana Springs	"
-                required
-              />
+                    <Field
+                      type="text"
+                      id="fname"
+                      name="fname"
+                      className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
+                      placeholder=""
+                      required
+                    />
 
-              <div className="h-8"></div>
-              <div className="grid lg:grid-cols-[15%_75%] gap-x-10">
-                <label
-                  htmlFor="country"
-                  className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
-                >
-                  Country
-                </label>
+                    <label
+                      htmlFor="lname"
+                      className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
+                    >
+                      Last Name
+                    </label>
+                    <Field
+                      type="text"
+                      id="lname"
+                      name="lname"
+                      className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
+                      placeholder=""
+                      required
+                    />
+                  </div>
+                  <ErrorMessage name="fname" component="div" />
+                  <ErrorMessage name="lname" component="div" />
 
-                <input
-                  type="number"
-                  id="country"
-                  className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
-                  value="64"
-                  required
-                />
+                  <div className="h-8"></div>
+                  <label
+                    className="mt-8 font-medium my-2 text-sm md:text-md text-gray-200"
+                    htmlFor="email"
+                  >
+                    Email
+                  </label>
+                  <Field
+                    type="email"
+                    id="email"
+                    name="email"
+                    className="block bg-neutral-800 w-full p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md min-w-[500px] rounded-lg "
+                    placeholder="example@example.com"
+                    required
+                  />
+                  <ErrorMessage name="email" component="div" />
 
-                <label
-                  htmlFor="phone"
-                  className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
-                >
-                  Phone number
-                </label>
-                <input
-                  type="number"
-                  id="phone"
-                  className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
-                  placeholder=""
-                  required
-                />
-              </div>
+                  <div className="h-8"></div>
+                  <label
+                    className="mt-8 font-medium my-2 text-sm md:text-md text-gray-200"
+                    htmlFor="address"
+                  >
+                    Address
+                  </label>
+                  <Field
+                    type="text"
+                    id="address"
+                    name="address"
+                    className="block bg-neutral-800 w-full p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md min-w-[500px] rounded-lg "
+                    placeholder="E.g. 27D Te Waerenga Rd, Hamurana Springs	"
+                    required
+                  />
+                  <ErrorMessage name="address" component="div" />
 
-              <div className="h-8"></div>
-              <div className="grid lg:grid-cols-2 gap-x-10">
-                <label
-                  htmlFor="fname"
-                  className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
-                >
-                  Latitude
-                </label>
+                  <div className="h-8"></div>
+                  <div className="grid lg:grid-cols-[15%_75%] gap-x-10">
+                    <label
+                      htmlFor="country"
+                      className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
+                    >
+                      Country
+                    </label>
 
-                <input
-                  type="numebr"
-                  id="lat"
-                  className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
-                  placeholder=""
-                  value={lat}
-                  required
-                />
+                    <Field
+                      type="number"
+                      id="country"
+                      name="phone_country"
+                      className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
+                      value="64"
+                    />
 
-                <label
-                  htmlFor="lng"
-                  className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
-                >
-                  Longitude
-                </label>
-                <input
-                  type="number"
-                  id="lng"
-                  className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
-                  placeholder=""
-                  value={lng}
-                  required
-                />
-              </div>
+                    <label
+                      htmlFor="phone"
+                      className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
+                    >
+                      Phone number
+                    </label>
+                    <Field
+                      type="number"
+                      id="phone"
+                      name="phone"
+                      className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
+                      placeholder=""
+                    />
+                  </div>
+                  <ErrorMessage name="phone" component="div" />
+                  <ErrorMessage name="phone_country" component="div" />
 
-              <div className="h-8"></div>
-              <label
-                className="mt-8 font-medium my-2 text-sm md:text-md text-gray-200"
-                htmlFor="description"
-              >
-                Description
-              </label>
-              <input
-                type="text"
-                id="description"
-                className="block bg-neutral-800 w-full p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md min-w-[500px] rounded-lg "
-                placeholder="The water is not working"
-                required
-              />
+                  <div className="h-8"></div>
+                  <div className="grid lg:grid-cols-2 gap-x-10">
+                    <label
+                      htmlFor="lat"
+                      className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
+                    >
+                      Latitude
+                    </label>
 
-              <button className="px-4 py-3 mt-6 m-0 ml-auto self-end bg-purple-200 text-neutral-700 block w-auto rounded-md">
-                Submit
-              </button>
+                    <Field
+                      type="numebr"
+                      id="lat"
+                      name="lat"
+                      className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
+                      placeholder=""
+                      required
+                    />
+
+                    <label
+                      htmlFor="lng"
+                      className="font-medium my-2 text-sm md:text-md text-gray-200 lg:row-start-1"
+                    >
+                      Longitude
+                    </label>
+                    <Field
+                      type="number"
+                      id="lng"
+                      name="lng"
+                      className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"
+                      placeholder=""
+                      required
+                    />
+                  </div>
+                  <ErrorMessage name="lng" component="div" />
+                  <ErrorMessage name="lat" component="div" />
+
+                  <div className="h-8"></div>
+                  <label
+                    className="mt-8 font-medium my-2 text-sm md:text-md text-gray-200"
+                    htmlFor="description"
+                  >
+                    Description
+                  </label>
+                  <Field
+                    type="text"
+                    id="description"
+                    name="description"
+                    className="block bg-neutral-800 w-full p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md min-w-[500px] rounded-lg "
+                    placeholder="The water is not working"
+                    required
+                  />
+                  <ErrorMessage name="description" component="div" />
+
+                  <button
+                    type="submit"
+                    className="px-4 py-3 mt-6 m-0 ml-auto self-end bg-purple-200 text-neutral-700 block w-auto rounded-md"
+                  >
+                    Submit
+                  </button>
+                </Form>
+              </Formik>
             </div>
           </div>
         </div>

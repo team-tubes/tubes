@@ -1,6 +1,6 @@
 export default function Search({ value, setValue }) {
 	return (
-		<form className="w-full">
+		<form className="w-full" onSubmit={e => { e.preventDefault(); }}>
 			<label
 				htmlFor="default-search"
 				className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"

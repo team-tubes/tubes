@@ -1,0 +1,127 @@
+[
+	{
+		"start_time": 1692380126.0,
+		"rest_time": 1692466526.0,
+		"description": "Loss of Broadband Services",
+		"status": "N",
+		"sites": [
+			{
+				"role": "DSL",
+				"impact": 5,
+				"point": "{\"type\":\"Point\",\"coordinates\":[174.86886,-36.97219]}"
+			}
+		]
+	},
+	{
+		"start_time": 1692415057.0,
+		"rest_time": 1692572400.0,
+		"status": "N",
+		"sites": [
+			{
+				"role": "FRE_CABLEPAIR",
+				"impact": 2,
+				"point": "{\"type\":\"Point\",\"coordinates\":[173.65249,-35.65524]}"
+			}
+		]
+	},
+	{
+		"add_desc": "17/08/2023 15:13 Update\nThe fault is in the process of being assigned to a Chorus technician. Further updates to come once a technician has been dispatched.",
+		"start_time": 1692237875.0,
+		"rest_time": 1692324275.0,
+		"description": "Loss of Broadband Services",
+		"status": "N",
+		"sites": [
+			{
+				"role": "DSL",
+				"impact": 4,
+				"point": "{\"type\":\"Point\",\"coordinates\":[174.36251,-36.23946]}"
+			}
+		]
+	},
+	{
+		"add_desc": "18/08/2023 12:49 Update\nA Chorus technician has been assigned to the fault. Current Estimated time of arrival is 19:00Hrs 18/08/2023. Further Updates to come once available",
+		"start_time": 1692314396.0,
+		"rest_time": 1692342000.0,
+		"description": "Loss of NGA/Broadband Services",
+		"status": "N",
+		"sites": [
+			{
+				"role": "GPON",
+				"impact": 6,
+				"point": "{\"type\":\"Point\",\"coordinates\":[174.66265,-36.79639]}"
+			}
+		]
+	},
+	{
+		"start_time": 1692357884.0,
+		"rest_time": 1692444284.0,
+		"description": "Loss of NGA/Broadband Services",
+		"status": "N",
+		"sites": [
+			{
+				"role": "GPON",
+				"impact": 15,
+				"point": "{\"type\":\"Point\",\"coordinates\":[170.51894,-45.86171]}"
+			}
+		]
+	},
+	{
+		"start_time": 1692370267.0,
+		"rest_time": 1692456667.0,
+		"description": "Loss of Broadband Services",
+		"status": "N",
+		"sites": [
+			{
+				"role": "DSL",
+				"impact": 6,
+				"point": "{\"type\":\"Point\",\"coordinates\":[170.75537,-44.24497]}"
+			}
+		]
+	},
+	{
+		"start_time": 1692397736.0,
+		"rest_time": 1692484136.0,
+		"description": "Loss of NGA/Broadband Services",
+		"status": "N",
+		"sites": [
+			{
+				"role": "GPON",
+				"impact": 11,
+				"point": "{\"type\":\"Point\",\"coordinates\":[174.69015,-36.89927]}"
+			}
+		]
+	},
+	{
+		"add_desc": "18/08/2023 16:51 Update\nChorus technicians have provided a temporary fix. However, services continue to be impacted. Technicians requires more than a day to fix at site as digging is required. No current Estimated time to restore.",
+		"start_time": 1691821090.0,
+		"rest_time": 1691907490.0,
+		"description": "Intermittent Loss of Broadband Services",
+		"status": "N",
+		"sites": [
+			{
+				"role": "DSL",
+				"impact": 3,
+				"point": "{\"type\":\"Point\",\"coordinates\":[175.44731,-38.20689]}"
+			}
+		]
+	},
+	{
+		"add_desc": "18/08/2023 10:10 Update\nServices continue to be impacted. Chorus technicians will resume further investigation today. Current Estimated time of arrival is 15:00hrs 18/08/2023. ",
+		"start_time": 1692138499.0,
+		"rest_time": 1692327600.0,
+		"description": "Loss of NGA/Broadband Services",
+		"status": "N",
+		"sites": [
+			{
+				"role": "GPON",
+				"impact": 16,
+				"point": "{\"type\":\"Point\",\"coordinates\":[174.85598,-36.85592]}"
+			},
+			{
+				"role": "GPON",
+				"impact": 14,
+				"point": "{\"type\":\"Point\",\"coordinates\":[174.87463,-36.8612]}"
+			}
+		]
+	}
+]

@@ -4,18 +4,25 @@ import {
   _SunLight as SunLight,
 } from "@deck.gl/core";
 import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
-import DeckGL from "@deck.gl/react";
+
 import { scaleThreshold } from "d3-scale";
-import "mapbox-gl/dist/mapbox-gl.css";
 import maplibregl from "maplibre-gl";
-import React, { useEffect, useState } from "react";
-import { Map } from "react-map-gl";
-import chorus_data from "../InternetLayer";
-import MapToolTip from "../components/MapToolTip";
-import Modal from "../components/Modal";
+import { useEffect, useState } from "react";
+import { Map, useControl, NavigationControl } from "react-map-gl";
+import { _GeoJSONLoader } from "@loaders.gl/json";
+import { load } from "@loaders.gl/core";
+import { getAirQuality } from "../data_parsers/AirQuality";
+
+import chorus_data from "../layers/InternetLayer";
+import { get_auckland_council_water_outages } from "../layers/WaterLayer";
+import WaterOutageMarkers from "../layers/WaterOutageMarkers";
+import { MapboxOverlay } from "@deck.gl/mapbox";
+import { WaterPipeLayer } from "../layers/WaterPipeLayer";
+import { FireHydrantLayer } from "../layers/FireHydrantLayer";
 
 // Source data GeoJSON
 const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
+const AIR_QUALITY_DATA_URL = "./Air_Quality.geojson";
 
 const COLOR_SCALE = scaleThreshold()
   .domain([
@@ -71,9 +78,59 @@ const landCover = [
   ],
 ];
 
+function randomIntFromInterval(min, max) {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function getRandomColor() {
+  return [
+    randomIntFromInterval(0, 180),
+    randomIntFromInterval(0, 0),
+    randomIntFromInterval(0, 255),
+  ];
+}
+
+// Fetch air quality data once.
+
+export function DeckGLOverlay(props) {
+  const overlay = useControl(() => new MapboxOverlay(props));
+  overlay.setProps(props);
+  return null;
+}
+
 export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   const [internetData, setInternetData] = useState();
+  const [waterOutageData, setWaterOutageData] = useState([]);
+  const [hydrantData, setHydrantData] = useState();
 
+  const [suburbData, setSuburbData] = useState();
+  const [airQualityData, setAirQualityData] = useState();
+  useEffect(() => {
+    get_auckland_council_water_outages().then((data) =>
+      setWaterOutageData(data)
+    );
+    fetch("./SuburbBorders.geojson")
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setSuburbData(data);
+      });
+
+    fetch(AIR_QUALITY_DATA_URL)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log({ data });
+        setAirQualityData(data);
+      });
+  }, []);
+
+  //   useEffect(() => {
+  // 	console.log(getFeatures())
+  //   }, [])
   useEffect(() => {
     const asyncFn = async () => {
       const internet_geometry_data = await chorus_data();
@@ -87,51 +144,14 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
         features: internet_geometry_data,
       });
     };
+
     asyncFn();
+
+    (async () => {
+      const data = await load("Water_Hydrant_Central.geojson", _GeoJSONLoader);
+      setHydrantData(data);
+    })();
   }, []);
-
-  const [effects] = useState(() => {
-    const lightingEffect = new LightingEffect({ ambientLight, dirLight });
-    lightingEffect.shadowColor = [0, 0, 0, 0.5];
-    return [lightingEffect];
-  });
-
-  const layers = [
-    // only needed when using shadows - a plane for shadows to drop on
-    new PolygonLayer({
-      id: "ground",
-      data: landCover,
-      stroked: false,
-      getPolygon: (f) => f,
-      getFillColor: [0, 0, 0, 0],
-    }),
-    new GeoJsonLayer({
-      id: "geojson",
-      data,
-      opacity: 0.8,
-      stroked: false,
-      filled: true,
-      extruded: true,
-      wireframe: true,
-      getElevation: (f) => Math.sqrt(f.properties.valuePerSqm) * 10,
-      getFillColor: (f) => COLOR_SCALE(f.properties.growth),
-      getLineColor: [255, 255, 255],
-      pickable: true,
-    }),
-    new GeoJsonLayer({
-      id: "geojson2",
-      data: internetData,
-      opacity: 0.8,
-      stroked: false,
-      filled: true,
-      extruded: true,
-      wireframe: true,
-      getElevation: (f) => 0,
-      getFillColor: [255, 255, 255],
-      getLineColor: [255, 255, 255],
-      pickable: true,
-    }),
-  ];
 
   const mapboxBuildingLayer = {
     id: "3d-buildings",
@@ -147,24 +167,106 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   };
 
   return (
-	<>
-	<Modal/>
-    <DeckGL
-      layers={layers}
-      effects={effects}
-      initialViewState={INITIAL_VIEW_STATE}
-      controller={true}
-      getTooltip={() => MapToolTip()}
-    >
+    <div className="w-full h-full">
       <Map
+        style={{ width: "100vw", height: "100vh" }}
+        initialViewState={INITIAL_VIEW_STATE}
         reuseMaps
+        mapboxAccessToken="pk.eyJ1Ijoic3NuZXZlcmEiLCJhIjoiY2xsaHB4c3JoMWM2ZDNkcGtzOXJyemE4dCJ9.1OH8vr4265s8adq2s3fCuA"
         mapLib={maplibregl}
         mapStyle={mapStyle}
         preventStyleDiffing={true}
         onLoad={(e) => {
           e.target.addLayer(mapboxBuildingLayer);
         }}
-      />
-    </DeckGL></>
+      >
+        <DeckGLOverlay
+          layers={[
+            new GeoJsonLayer({
+              id: "geojson2",
+              data: internetData,
+              opacity: 0.8,
+              stroked: false,
+              filled: true,
+              extruded: true,
+              wireframe: true,
+              getElevation: (f) => 0,
+              getFillColor: [255, 255, 255],
+              getLineColor: [255, 255, 255],
+              pickable: true,
+            }),
+          ]}
+        />
+
+        <WaterPipeLayer />
+        <FireHydrantLayer />
+        <DeckGLOverlay
+          layers={[
+            new PolygonLayer({
+              id: "ground",
+              data: landCover,
+              stroked: false,
+              getPolygon: (f) => f,
+              getFillColor: [0, 0, 0, 0],
+            }),
+          ]}
+        />
+        {airQualityData && (
+          <DeckGLOverlay
+            layers={[
+              new GeoJsonLayer({
+                id: "suburbGeo",
+                data: suburbData,
+                opacity: 0.1,
+                stroked: true,
+                filled: true,
+                extruded: false,
+                wireframe: false,
+                getElevation: (f) => 0,
+                getFillColor: (d) => {
+                  const sumLatLng = d.geometry.coordinates[0].reduce(
+                    (acc, curr) => ({
+                      lng: acc.lng + curr[0],
+                      lat: acc.lat + curr[1],
+                    }),
+                    { lng: 0, lat: 0 }
+                  );
+                  const avgLatLng = {
+                    lat: sumLatLng.lat / d.geometry.coordinates[0].length,
+                    lng: sumLatLng.lng / d.geometry.coordinates[0].length,
+                  };
+                  const airQ = getAirQuality(
+                    airQualityData,
+                    avgLatLng.lng,
+                    avgLatLng.lat
+                  );
+
+                  const con = airQ.Concentration;
+
+                  const normal = Math.min(
+                    Math.max(0, (con - 6.5) / (14.1 - 6.5)),
+                    1
+                  );
+                  const val = 255 * normal;
+                  return [val, 0, 255 * (1 - normal)];
+                },
+                getLineColor: [0, 0, 0],
+                getLineWidth: 1,
+                lineWidthScale: 20,
+                lineWidthMinPixels: 2,
+                pickable: true,
+
+                onClick: (d) => {
+                  console.log({ d });
+                },
+              }),
+            ]}
+          />
+        )}
+
+        <WaterOutageMarkers outage_data={waterOutageData} />
+        <NavigationControl />
+      </Map>
+    </div>
   );
 }

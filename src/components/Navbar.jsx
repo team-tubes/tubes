@@ -9,7 +9,7 @@ export default function Navbar() {
 			</a>
 			<ul className="flex flex-wrap">
 				<NavItem path={'/'} text="Map" />
-				<NavItem path={'/issues'} text="Issues" />
+				<NavItem path={'/issues'} text="Suburbs" />
 				<NavItem path={'/report'} text="Report" />
 			</ul>
 		</nav>

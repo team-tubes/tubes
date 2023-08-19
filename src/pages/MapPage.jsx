@@ -3,6 +3,8 @@ import { _GeoJSONLoader } from "@loaders.gl/json";
 
 import { Map, useControl, NavigationControl } from "react-map-gl";
 
+import { Modal } from "../components/Modal";
+
 import { WaterOutageMarkers } from "../layers/WaterOutageMarkers";
 import { WaterPipeLayer } from "../layers/WaterPipeLayer";
 import { FireHydrantLayer } from "../layers/FireHydrantLayer";
@@ -56,7 +58,8 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
         onLoad={(e) => {
           e.target.addLayer(mapboxBuildingLayer);
         }}
-      >        
+      >
+        <Modal />        
         <SuburbAirQualityLayer />
         <InternetLayer />
         <WaterPipeLayer />

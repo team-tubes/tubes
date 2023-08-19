@@ -1,4 +1,4 @@
-export default function Search() {
+export default function Search({ value, setValue }) {
 	return (
 		<form className="w-full">
 			<label
@@ -30,6 +30,8 @@ export default function Search() {
 					id="default-search"
 					className="block bg-white w-full p-4 pl-10 text-md text-gray-900 border  rounded-lg "
 					placeholder="Search Suburbs..."
+					value={value}
+					onChange={(e) => setValue(e.target.value)}
 					required
 				/>
 			</div>

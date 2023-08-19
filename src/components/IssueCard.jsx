@@ -13,7 +13,7 @@ export default function IssueCard({ suburb, issues }) {
 						{issues.length} Active Issues
 					</p>
 					<p className="font-medium my-2 text-sm md:text-md text-gray-200">
-						0 Assets Available
+						{Math.round(Math.random() * 10000)} Assets Available
 					</p>
 				</div>
 			</div>

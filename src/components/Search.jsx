@@ -28,7 +28,7 @@ export default function Search({ value, setValue }) {
 				<input
 					type="search"
 					id="default-search"
-					className="block bg-white w-full p-4 pl-10 text-md text-gray-900 border  rounded-lg "
+					className="block bg-neutral-800 w-full p-4 pl-10 text-md text-white border border-gray-600 rounded-lg "
 					placeholder="Search Suburbs..."
 					value={value}
 					onChange={(e) => setValue(e.target.value)}

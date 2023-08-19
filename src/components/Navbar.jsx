@@ -3,7 +3,7 @@ import { NavItem } from './NavItem';
 
 export default function Navbar() {
 	return (
-		<nav className="sticky items-center top-0 z-20 flex flex-wrap justify-between bg-black x-2 drop-shadow-lg px-8 py-3">
+		<nav className="sticky items-center top-0 z-20 flex flex-wrap justify-between bg-neutral-800 x-2 drop-shadow-lg px-4 py-3">
 			<a href="#" className="text-lg font-bold">
 				infra.nz
 			</a>

@@ -1,6 +1,7 @@
 import { Marker, Popup } from "react-map-gl";
 import { useState, useEffect } from "react";
 import { format, parseISO, intervalToDuration } from "date-fns";
+import { eventBus } from "../utils/utils"
 
 export const WaterOutageMarkers = () => {
   const [waterOutageData, setWaterOutageData] = useState([]);
@@ -38,12 +39,20 @@ const WaterOutageMarker = (outage) => {
 
   const start = parseISO(startDate);
 
+  // close any previously open water outage markers.
+  eventBus.on("openWaterOutageMarker", () =>
+  {
+    if(isPopupOpen)
+      setIsPopupOpen(false);
+  });
+
   return (
     <>
       <Marker
         pickable={true}
         onClick={(e) => {
           e.originalEvent.stopPropagation();
+          eventBus.dispatch("openWaterOutageMarker", {});
           setIsPopupOpen(true);
         }}
         style={{ zIndex: 100 }}

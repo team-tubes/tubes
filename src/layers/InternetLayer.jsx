@@ -1,11 +1,9 @@
-import { Marker, Popup } from "react-map-gl";
+import { Popup } from "react-map-gl";
 import { useEffect, useState } from "react";
-import { format, parseISO, intervalToDuration, fromUnixTime } from "date-fns";
+import { format, fromUnixTime } from "date-fns";
 import { GeoJsonLayer } from "deck.gl";
 import { DeckGLOverlay } from "../pages/MapPage";
 import { _GeoJSONLoader } from "@loaders.gl/json";
-import { buffer } from "@turf/turf";
-import { load } from "@loaders.gl/core";
 import chorus_data from "./InternetSource";
 
 export const InternetLayer = () => {

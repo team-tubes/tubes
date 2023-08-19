@@ -1,48 +1,16 @@
-import {
-  AmbientLight,
-  LightingEffect,
-  _SunLight as SunLight,
-} from "@deck.gl/core";
-import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
-
-import { scaleThreshold } from "d3-scale";
-import maplibregl from "maplibre-gl";
-import { useEffect, useState } from "react";
-import { Map, useControl, NavigationControl } from "react-map-gl";
-import { _GeoJSONLoader } from "@loaders.gl/json";
-import { load } from "@loaders.gl/core";
-
-import { get_auckland_council_water_outages } from "../layers/WaterLayer";
-import WaterOutageMarkers from "../layers/WaterOutageMarkers";
+import { PolygonLayer } from "@deck.gl/layers";
 import { MapboxOverlay } from "@deck.gl/mapbox";
+import { _GeoJSONLoader } from "@loaders.gl/json";
+
+import { Map, useControl, NavigationControl } from "react-map-gl";
+
+import { WaterOutageMarkers } from "../layers/WaterOutageMarkers";
 import { WaterPipeLayer } from "../layers/WaterPipeLayer";
 import { FireHydrantLayer } from "../layers/FireHydrantLayer";
 import { InternetLayer } from "../layers/InternetLayer";
 import { SuburbAirQualityLayer } from "../layers/SuburbAirQualityLayer";
 
-// Source data GeoJSON
-const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
-
-const COLOR_SCALE = scaleThreshold()
-  .domain([
-    -0.6, -0.45, -0.3, -0.15, 0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1.05, 1.2,
-  ])
-  .range([
-    [65, 182, 196],
-    [127, 205, 187],
-    [199, 233, 180],
-    [237, 248, 177],
-    // zero
-    [255, 255, 204],
-    [255, 237, 160],
-    [254, 217, 118],
-    [254, 178, 76],
-    [253, 141, 60],
-    [252, 78, 42],
-    [227, 26, 28],
-    [189, 0, 38],
-    [128, 0, 38],
-  ]);
+import maplibregl from "maplibre-gl";
 
 const INITIAL_VIEW_STATE = {
   latitude: -36.8509,
@@ -56,18 +24,6 @@ const INITIAL_VIEW_STATE = {
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-const ambientLight = new AmbientLight({
-  color: [255, 255, 255],
-  intensity: 1.0,
-});
-
-const dirLight = new SunLight({
-  timestamp: Date.UTC(2019, 7, 1, 22),
-  color: [255, 255, 255],
-  intensity: 1.0,
-  _shadow: true,
-});
-
 const landCover = [
   [
     [-123.0, 49.196],
@@ -77,19 +33,6 @@ const landCover = [
   ],
 ];
 
-function randomIntFromInterval(min, max) {
-  // min and max included
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function getRandomColor() {
-  return [
-    randomIntFromInterval(0, 180),
-    randomIntFromInterval(0, 0),
-    randomIntFromInterval(0, 255),
-  ];
-}
-
 // Fetch air quality data once.
 
 export function DeckGLOverlay(props) {
@@ -98,15 +41,7 @@ export function DeckGLOverlay(props) {
   return null;
 }
 
-export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
-  const [waterOutageData, setWaterOutageData] = useState([]);
-
-  useEffect(() => {
-    get_auckland_council_water_outages().then((data) =>
-      setWaterOutageData(data)
-    );
-  }, []);
-
+export default function MapPage({ mapStyle = MAP_STYLE }) {
   const mapboxBuildingLayer = {
     id: "3d-buildings",
     source: "carto",
@@ -146,12 +81,12 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
           ]}
         />
         
-        <SuburbAirQualityLayer/>
+        <SuburbAirQualityLayer />
         <InternetLayer />
         <WaterPipeLayer />
         <FireHydrantLayer />
 
-        <WaterOutageMarkers outage_data={waterOutageData} />
+        <WaterOutageMarkers />
         <NavigationControl />
       </Map>
     </div>

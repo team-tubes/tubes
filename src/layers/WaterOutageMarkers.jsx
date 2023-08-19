@@ -1,10 +1,21 @@
 import { Marker, Popup } from "react-map-gl";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format, parseISO, intervalToDuration } from "date-fns";
-const WaterOutageMarkers = ({ outage_data }) => {
+
+import { get_auckland_council_water_outages } from "../layers/WaterLayer";
+
+export const WaterOutageMarkers = () => {
+  const [waterOutageData, setWaterOutageData] = useState([]);
+
+  useEffect(() => {
+    get_auckland_council_water_outages().then((data) =>
+      setWaterOutageData(data)
+    );
+  }, []);
+
   return (
     <>
-      {outage_data.map((outage) => {
+      {waterOutageData.map((outage) => {
         return <WaterOutageMarker key={outage.outageId} {...outage} />;
       })}
     </>

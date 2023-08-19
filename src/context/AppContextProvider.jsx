@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import suburbs from '../assets/suburbs.json';
 import axios from 'axios';
 
-const WATERCARE_BASE_URL = 'https://api.watercare.co.nz';
+const WATERCARE_BASE_URL = 'https://api.infra.nz/api';
 
 export function getInitialState(key) {
 	const context = localStorage.getItem(key);
@@ -151,7 +151,7 @@ export default function AppContextProvider({ children }) {
 
 	async function getSuburbsData() {
 		try {
-			const res = await axios.get(`${WATERCARE_BASE_URL}/outages/all`);
+			const res = await axios.get(`${WATERCARE_BASE_URL}/watercare/all`);
 			const data = res.data;
 			return data;
 		} catch (err) {

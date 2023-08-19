@@ -17,9 +17,10 @@ const WaterOutageMarker = (outage) => {
     longitude,
     location,
     startDate,
-    type,
+    outageType,
     outage_data: { description, duration },
   } = outage;
+
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const durationFormat = intervalToDuration({
     start: 0,
@@ -57,7 +58,7 @@ const WaterOutageMarker = (outage) => {
               <span className="">{description}</span>
               <br />
               <p className="flex flex-row w-full">
-                <span className="font-semibold">Type:</span> {type}
+                <span className="font-semibold mr-1">Type: </span> {outageType}
               </p>
               <span className="">
                 <span className="font-semibold"> Est Duration:</span>{" "}

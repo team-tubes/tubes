@@ -11,6 +11,7 @@ export default function Navbar() {
 				<NavItem path={'/'} text="Map" />
 				<NavItem path={'/issues'} text="Suburbs" />
 				<NavItem path={'/report'} text="Report" />
+				<NavItem path={'/upload'} text="Upload" />
 			</ul>
 		</nav>
 	);

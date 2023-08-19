@@ -1,0 +1,17 @@
+{% for complaint in complaints %}
+<div style="padding: 1rem">
+  <p>{{ complaint.person.first_name }} {{ complaint.person.last_name }}</p>
+  <p>email: {{ complaint.person.email }}</p>
+
+  {% if complaint.location.phone %}
+  <p>{{ complaint.location.phone }}</p>
+  {%- endif %}
+
+  <p>LAT: {{ complaint.location.lat }} LNG: {{ complaint.location.lng }}</p>
+  {% if complaint.location.address %}
+  <p>{{ complaint.location.address }}</p>
+  {%- endif %}
+
+  <p>{{ complaint.description }}</p>
+</div>
+{%- endfor %}

@@ -11,9 +11,7 @@ import maplibregl from "maplibre-gl";
 import React, { useEffect, useState } from "react";
 import { Map, useControl } from "react-map-gl";
 import MapToolTip from "../components/MapToolTip";
-import Modal from "../components/Modal";
 import chorus_data from "../layers/InternetLayer";
-import get_auckland_council_water_outages from "../layers/WaterLayer";
 import WaterOutageMarkers from "../layers/WaterOutageMarkers";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 
@@ -104,11 +102,6 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
     lightingEffect.shadowColor = [0, 0, 0, 0.5];
     return [lightingEffect];
   });
-  const layers = [
-    // only needed when using shadows - a plane for shadows to drop on
-    ,
-    
-  ];
 
   const mapboxBuildingLayer = {
     id: "3d-buildings",
@@ -125,21 +118,17 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
 
   return (
     <DeckGL
-      layers={layers}
+      layers={[]}
       effects={effects}
       initialViewState={INITIAL_VIEW_STATE}
       controller={true}
       getTooltip={() => MapToolTip()}
-	  onClick={(e)=>{console.log(e)}}
-
     >
       <Map
         reuseMaps
         mapLib={maplibregl}
-        layers={layers}
         mapStyle={mapStyle}
         preventStyleDiffing={true}
-        style={{ zIndex: 100 }}
         onLoad={(e) => {
           e.target.addLayer(mapboxBuildingLayer);
         }}
@@ -158,41 +147,40 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
               getFillColor: [255, 255, 255],
               getLineColor: [255, 255, 255],
               pickable: true,
-			  onclick: (e)=>console.log('asfsa'),
             }),
           ]}
         />
 
-		<DeckGLOverlay
+        <DeckGLOverlay
           layers={[
             new GeoJsonLayer({
-				id: "geojson",
-				data,
-				opacity: 0.8,
-				stroked: false,
-				filled: true,
-				extruded: true,
-				wireframe: true,
-				getElevation: (f) => Math.sqrt(f.properties.valuePerSqm) * 10,
-				getFillColor: (f) => COLOR_SCALE(f.properties.growth),
-				getLineColor: [255, 255, 255],
-				pickable: true,
-			  })
+              id: "geojson",
+              data,
+              opacity: 0.8,
+              stroked: false,
+              filled: true,
+              extruded: true,
+              wireframe: true,
+              getElevation: (f) => Math.sqrt(f.properties.valuePerSqm) * 10,
+              getFillColor: (f) => COLOR_SCALE(f.properties.growth),
+              getLineColor: [255, 255, 255],
+              pickable: true,
+            }),
           ]}
         />
 
-		<DeckGLOverlay
-			layers={[
-				new PolygonLayer({
-					id: "ground",
-					
-					data: landCover,
-					stroked: false,
-					getPolygon: (f) => f,
-					getFillColor: [0, 0, 0, 0],
-				  })
-			]}
-		/>
+        <DeckGLOverlay
+          layers={[
+            new PolygonLayer({
+              id: "ground",
+
+              data: landCover,
+              stroked: false,
+              getPolygon: (f) => f,
+              getFillColor: [0, 0, 0, 0],
+            }),
+          ]}
+        />
 
         <WaterOutageMarkers
           style={{ zIndex: 1000 }}

@@ -38,7 +38,6 @@ export const InternetLayer = () => {
             lineWidthScale: 3,
             filled: true,
             onClick: (e) => {
-              console.log(e);
               setCoordinates(e.coordinate);
               setIsPopupOpen(true);
               setSelectedRegion(e.object);

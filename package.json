@@ -11,6 +11,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@loaders.gl/core": "^3.4.11",
+    "@loaders.gl/json": "^3.4.11",
+    "@loaders.gl/obj": "^3.4.11",
+    "@turf/turf": "^6.5.0",
     "axios": "^1.4.0",
     "clsx": "^2.0.0",
     "d3-scale": "^2.0.0",

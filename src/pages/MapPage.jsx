@@ -106,26 +106,8 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   });
   const layers = [
     // only needed when using shadows - a plane for shadows to drop on
-    new PolygonLayer({
-      id: "ground",
-      data: landCover,
-      stroked: false,
-      getPolygon: (f) => f,
-      getFillColor: [0, 0, 0, 0],
-    }),
-    new GeoJsonLayer({
-      id: "geojson",
-      data,
-      opacity: 0.8,
-      stroked: false,
-      filled: true,
-      extruded: true,
-      wireframe: true,
-      getElevation: (f) => Math.sqrt(f.properties.valuePerSqm) * 10,
-      getFillColor: (f) => COLOR_SCALE(f.properties.growth),
-      getLineColor: [255, 255, 255],
-      pickable: true,
-    }),
+    ,
+    
   ];
 
   const mapboxBuildingLayer = {
@@ -148,9 +130,10 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
       initialViewState={INITIAL_VIEW_STATE}
       controller={true}
       getTooltip={() => MapToolTip()}
+	  onClick={(e)=>{console.log(e)}}
+
     >
       <Map
-        onClick={(e) => console.log("ASgdsgd")}
         reuseMaps
         mapLib={maplibregl}
         layers={layers}
@@ -175,9 +158,41 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
               getFillColor: [255, 255, 255],
               getLineColor: [255, 255, 255],
               pickable: true,
+			  onclick: (e)=>console.log('asfsa'),
             }),
           ]}
         />
+
+		<DeckGLOverlay
+          layers={[
+            new GeoJsonLayer({
+				id: "geojson",
+				data,
+				opacity: 0.8,
+				stroked: false,
+				filled: true,
+				extruded: true,
+				wireframe: true,
+				getElevation: (f) => Math.sqrt(f.properties.valuePerSqm) * 10,
+				getFillColor: (f) => COLOR_SCALE(f.properties.growth),
+				getLineColor: [255, 255, 255],
+				pickable: true,
+			  })
+          ]}
+        />
+
+		<DeckGLOverlay
+			layers={[
+				new PolygonLayer({
+					id: "ground",
+					
+					data: landCover,
+					stroked: false,
+					getPolygon: (f) => f,
+					getFillColor: [0, 0, 0, 0],
+				  })
+			]}
+		/>
 
         <WaterOutageMarkers
           style={{ zIndex: 1000 }}

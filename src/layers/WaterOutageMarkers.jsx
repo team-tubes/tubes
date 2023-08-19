@@ -17,7 +17,7 @@ const WaterOutageMarker = ({latitude,longitude}) =>{
 
     return(
         <>
-            <Marker style={{zIndex:1000}} onClick={(e)=>console.log('pee')} latitude={latitude} longitude={longitude} color="red">
+            <Marker style={{zIndex:1000}}  onClick={(e)=>{e.stopPropagation(); console.log(e)}} latitude={latitude} longitude={longitude} color="red">
                 {/* <Popup closeOnClick={true} latitude={latitude} longitude={longitude}>afasf</Popup> */}
                 {/* Custom icon can be put her but gaf */}
             </Marker>

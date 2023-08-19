@@ -58,6 +58,9 @@ const WaterOutageMarker = (outage) => {
               <span className="">{description}</span>
               <br />
               <p className="flex flex-row w-full">
+                <span className="font-semibold mr-1">Agency: </span> Watercare
+              </p>
+              <p className="flex flex-row w-full">
                 <span className="font-semibold mr-1">Type: </span> {outageType}
               </p>
               <span className="">

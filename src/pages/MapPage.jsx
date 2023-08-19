@@ -4,22 +4,21 @@ import {
   _SunLight as SunLight,
 } from "@deck.gl/core";
 import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
-import DeckGL from "@deck.gl/react";
+
 import { scaleThreshold } from "d3-scale";
 import maplibregl from "maplibre-gl";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Map, useControl, NavigationControl } from "react-map-gl";
-import MapToolTip from "../components/MapToolTip";
-import {loadSuburbsAndLocalities } from '../data_parsers/SuburbsLocalities'
-import {getAirQuality, setAirQualityData} from '../data_parsers/AirQuality'
+
 import chorus_data from "../layers/InternetLayer";
 import { get_auckland_council_water_outages } from "../layers/WaterLayer";
 import WaterOutageMarkers from "../layers/WaterOutageMarkers";
 import { MapboxOverlay } from "@deck.gl/mapbox";
+import { getAirQuality } from "../data_parsers/AirQuality";
 
 // Source data GeoJSON
 const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
-const AIR_QUALITY_DATA_URL = './Air_Quality.geojson';
+const AIR_QUALITY_DATA_URL = "./Air_Quality.geojson";
 
 const COLOR_SCALE = scaleThreshold()
   .domain([
@@ -75,15 +74,20 @@ const landCover = [
   ],
 ];
 
+function randomIntFromInterval(min, max) {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function getRandomColor() {
+  return [
+    randomIntFromInterval(0, 180),
+    randomIntFromInterval(0, 0),
+    randomIntFromInterval(0, 255),
+  ];
+}
 
 // Fetch air quality data once.
-fetch(AIR_QUALITY_DATA_URL)
-.then((response) => {
-	return response.json();
-})
-.then((json) => {
-	setAirQualityData(json);
-});
 
 function DeckGLOverlay(props) {
   const overlay = useControl(() => new MapboxOverlay(props));
@@ -94,11 +98,28 @@ function DeckGLOverlay(props) {
 export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   const [internetData, setInternetData] = useState();
   const [waterOutageData, setWaterOutageData] = useState([]);
-
+  const [suburbData, setSuburbData] = useState();
+  const [airQualityData, setAirQualityData] = useState();
   useEffect(() => {
     get_auckland_council_water_outages().then((data) =>
       setWaterOutageData(data)
     );
+    fetch("./SuburbBorders.geojson")
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setSuburbData(data);
+      });
+
+    fetch(AIR_QUALITY_DATA_URL)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log({ data });
+        setAirQualityData(data);
+      });
   }, []);
 
   useEffect(() => {
@@ -116,12 +137,6 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
     };
     asyncFn();
   }, []);
-
-  const [effects] = useState(() => {
-    const lightingEffect = new LightingEffect({ ambientLight, dirLight });
-    lightingEffect.shadowColor = [0, 0, 0, 0.5];
-    return [lightingEffect];
-  });
 
   const mapboxBuildingLayer = {
     id: "3d-buildings",
@@ -148,7 +163,6 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
         preventStyleDiffing={true}
         onLoad={(e) => {
           e.target.addLayer(mapboxBuildingLayer);
-          loadSuburbsAndLocalities(e.target);
         }}
       >
         <DeckGLOverlay
@@ -198,6 +212,58 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
             }),
           ]}
         />
+        {airQualityData && (
+          <DeckGLOverlay
+            layers={[
+              new GeoJsonLayer({
+                id: "suburbGeo",
+                data: suburbData,
+                opacity: 0.1,
+                stroked: true,
+                filled: true,
+                extruded: false,
+                wireframe: false,
+                getElevation: (f) => 0,
+                getFillColor: (d) => {
+                  const sumLatLng = d.geometry.coordinates[0].reduce(
+                    (acc, curr) => ({
+                      lng: acc.lng + curr[0],
+                      lat: acc.lat + curr[1],
+                    }),
+                    { lng: 0, lat: 0 }
+                  );
+                  const avgLatLng = {
+                    lat: sumLatLng.lat / d.geometry.coordinates[0].length,
+                    lng: sumLatLng.lng / d.geometry.coordinates[0].length,
+                  };
+                  const airQ = getAirQuality(
+                    airQualityData,
+                    avgLatLng.lng,
+                    avgLatLng.lat
+                  );
+
+                  const con = airQ.Concentration;
+
+                  const normal = Math.min(
+                    Math.max(0, (con - 6.5) / (14.1 - 6.5)),
+                    1
+                  );
+                  const val = 255 * normal;
+                  return [val, 0, 255 * (1 - normal)];
+                },
+                getLineColor: [0, 0, 0],
+                getLineWidth: 1,
+                lineWidthScale: 20,
+                lineWidthMinPixels: 2,
+                pickable: true,
+
+                onClick: (d) => {
+                  console.log({ d });
+                },
+              }),
+            ]}
+          />
+        )}
 
         <WaterOutageMarkers outage_data={waterOutageData} />
         <NavigationControl />

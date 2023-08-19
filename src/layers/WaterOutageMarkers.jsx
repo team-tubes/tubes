@@ -45,7 +45,7 @@ const WaterOutageMarker = (outage) => {
         {isPopupOpen && (
           <Popup
             style={{ zIndex: 100 }}
-            className="text-gray-700 focus:outline-none"
+            className="text-gray-700 text-neutral-100 focus:outline-none font-space-mono"
             closeOnClick={true}
             latitude={latitude}
             longitude={longitude}
@@ -54,22 +54,22 @@ const WaterOutageMarker = (outage) => {
             }}
           >
             <div className="m-3  flex flex-col justfiy-start ">
-              <span className="font-semibold text-lg">{location}</span>
+              <span className="text-purple-200 font-semibold text-lg">{location}</span>
               <span className="">{description}</span>
               <br />
               <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Agency: </span> Watercare
+                <span className="text-purple-200 font-semibold mr-1">Agency: </span> Watercare
               </p>
               <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Type: </span> {outageType}
+                <span className="text-purple-200 font-semibold mr-1">Type: </span> {outageType}
               </p>
               <span className="">
-                <span className="font-semibold"> Est Duration:</span>{" "}
+                <span className="text-purple-200 font-semibold"> Est Duration:</span>{" "}
                 {durationFormat.days ? `${durationFormat.days} days,` : ""}{" "}
                 {durationFormat.hours} hours
               </span>
               <span className="">
-                <span className="font-semibold"> Start:</span>{" "}
+                <span className="text-purple-200 font-semibold"> Start:</span>{" "}
                 {format(start, "HH:mm eee do MMM yyyy")}
               </span>
             </div>

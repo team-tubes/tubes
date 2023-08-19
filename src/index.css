@@ -4,10 +4,41 @@
 @tailwind components;
 @tailwind utilities;
 
-
 .mapboxgl-popup-close-button {
-    padding: 0.1rem 0.5rem;
+  padding: 0.1rem 0.5rem;
 }
 .mapboxgl-popup-content {
-width: 25rem;
+  width: 25rem;
+  background-color: rgb(38, 38, 38);
+}
+
+/* .maplibregl-popup-tip {
+    
+    border-top-color: rgb(38, 38, 38) !important;
+    border-left-color: rgb(38, 38, 38) !important;
+    border-right-color: rgb(38, 38, 38) !important;
+} */
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  border-bottom-color: rgb(38, 38, 38) !important;
+}
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color: rgb(38, 38, 38) !important;
+}
+.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+  border-right-color: rgb(38, 38, 38) !important;
+}
+.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+  border-left-color: rgb(38, 38, 38) !important;
+}
+.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+  border-bottom-color: rgb(38, 38, 38) !important;
+}
+.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip {
+  border-bottom-color: rgb(38, 38, 38) !important;
+}
+.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+  border-top-color: rgb(38, 38, 38) !important;
+}
+.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip {
+  border-top-color: rgb(38, 38, 38) !important;
 }

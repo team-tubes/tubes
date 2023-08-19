@@ -63,7 +63,7 @@ export const WaterPipeLayer = () => {
         {isPopupOpen && (
           <Popup
             style={{ zIndex: 100 }}
-            className="text-gray-700 focus:outline-none"
+            className="text-gray-700 focus:outline-none text-neutral-100 font-space-mono"
             closeOnClick={true}
             latitude={coordinates?.[1] || 0}
             longitude={coordinates?.[0] || 0}
@@ -73,22 +73,22 @@ export const WaterPipeLayer = () => {
               setSelectedPipe(undefined)
             }}
           >
-            <div className="m-3  flex flex-col justfiy-start ">
-              <span className="font-semibold text-lg">{selectedPipe.properties.FAC_DESC === "Not Applicable" ? "Water Pipe: " + selectedPipe.properties.USE_AREAID : "Water Pipe: "+selectedPipe.properties.FAC_DESC}</span>
+            <div className="m-3 flex flex-col justfiy-start ">
+              <span className="font-semibold text-lg text-purple-200">{selectedPipe.properties.FAC_DESC === "Not Applicable" ? "Water Pipe: " + selectedPipe.properties.USE_AREAID : "Water Pipe: "+selectedPipe.properties.FAC_DESC}</span>
               <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Installed: </span> {new Date(selectedPipe.properties.INSTALLED).toDateString()}
+                <span className="text-purple-200 font-semibold mr-1">Installed: </span> {new Date(selectedPipe.properties.INSTALLED).toDateString()}
               </p>
               <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Material: </span> {selectedPipe.properties.MATERIAL}
+                <span className="text-purple-200 font-semibold mr-1">Material: </span> {selectedPipe.properties.MATERIAL}
               </p>
               <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Position: </span> {selectedPipe.properties.POSITION}
+                <span className="text-purple-200 font-semibold mr-1">Position: </span> {selectedPipe.properties.POSITION}
               </p>
               <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Length: </span> {selectedPipe.properties.SHAPE_Length.toFixed(2) + "m"}
+                <span className="text-purple-200 font-semibold mr-1">Length: </span> {selectedPipe.properties.SHAPE_Length.toFixed(2) + "m"}
               </p>
               <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Diameter: </span> {selectedPipe.properties.NOM_DIA_MM.toFixed(2) + "mm"}
+                <span className="text-purple-200 font-semibold mr-1">Diameter: </span> {selectedPipe.properties.NOM_DIA_MM.toFixed(2) + "mm"}
               </p>
               
               

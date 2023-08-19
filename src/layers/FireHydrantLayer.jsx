@@ -43,7 +43,7 @@ export const FireHydrantLayer = () => {
       {isPopupOpen && (
         <Popup
           style={{ zIndex: 100 }}
-          className="text-gray-700 focus:outline-none"
+          className="text-gray-700 focus:outline-none font-space-mono"
           closeOnClick={true}
           latitude={coordinates?.[1] || 0}
           longitude={coordinates?.[0] || 0}

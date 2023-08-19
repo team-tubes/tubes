@@ -152,8 +152,6 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
           e.target.addLayer(mapboxBuildingLayer);
         }}
       >
-        <WaterPipeLayer />
-        <FireHydrantLayer />
         <DeckGLOverlay
           layers={[
             new PolygonLayer({
@@ -213,6 +211,8 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
           />
         )}
         <InternetLayer />
+        <WaterPipeLayer />
+        <FireHydrantLayer />
 
         <WaterOutageMarkers outage_data={waterOutageData} />
         <NavigationControl />

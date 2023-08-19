@@ -54,7 +54,7 @@ export const InternetLayer = () => {
       {isPopupOpen && (
         <Popup
           style={{ zIndex: 100 }}
-          className="text-gray-700 focus:outline-none"
+          className="text-gray-700 text-neutral-100 focus:outline-none font-space-mono"
           closeOnClick={true}
           latitude={coordinates?.[1] || 0}
           longitude={coordinates?.[0] || 0}
@@ -65,19 +65,19 @@ export const InternetLayer = () => {
           }}
         >
           <div className="m-3  flex flex-col justfiy-start ">
-            <span className="font-semibold text-lg">
+            <span className="text-purple-200 font-semibold text-lg">
               {selectedRegion.role} Issue
             </span>
             <p className="flex flex-row w-full">{selectedRegion.description}</p>
             <p className="flex flex-row w-full">
-              <span className="font-semibold mr-1">Reported at: </span>{" "}
+              <span className="text-purple-200 font-semibold mr-1">Reported at: </span>{" "}
               {format(
                 fromUnixTime(selectedRegion.start_time),
                 "HH:mm eee do MMM yyyy"
               )}
             </p>
             <p className="flex flex-row w-full">
-              <span className="font-semibold mr-1">
+              <span className="text-purple-200 font-semibold mr-1">
                 Estimated Restored by:{" "}
               </span>{" "}
               {format(
@@ -86,7 +86,7 @@ export const InternetLayer = () => {
               )}
             </p>
             <p className="flex flex-row w-full">
-              <span className="font-semibold mr-1">Impacted Services: </span>{" "}
+              <span className="text-purple-200 font-semibold mr-1">Impacted Services: </span>{" "}
               {selectedRegion.impact}
             </p>
           </div>

@@ -1,4 +1,3 @@
-import { PolygonLayer } from "@deck.gl/layers";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { _GeoJSONLoader } from "@loaders.gl/json";
 
@@ -23,17 +22,6 @@ const INITIAL_VIEW_STATE = {
 
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
-
-const landCover = [
-  [
-    [-123.0, 49.196],
-    [-123.0, 49.324],
-    [-123.306, 49.324],
-    [-123.306, 49.196],
-  ],
-];
-
-// Fetch air quality data once.
 
 export function DeckGLOverlay(props) {
   const overlay = useControl(() => new MapboxOverlay(props));
@@ -68,19 +56,7 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
         onLoad={(e) => {
           e.target.addLayer(mapboxBuildingLayer);
         }}
-      >
-        <DeckGLOverlay
-          layers={[
-            new PolygonLayer({
-              id: "ground",
-              data: landCover,
-              stroked: false,
-              getPolygon: (f) => f,
-              getFillColor: [0, 0, 0, 0],
-            }),
-          ]}
-        />
-        
+      >        
         <SuburbAirQualityLayer />
         <InternetLayer />
         <WaterPipeLayer />

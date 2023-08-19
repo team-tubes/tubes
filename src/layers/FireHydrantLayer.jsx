@@ -29,7 +29,7 @@ export const FireHydrantLayer = () => {
             data: fireHydrantData?.features || [],
             loaders: [OBJLoader, _GeoJSONLoader],
             getColor: (d) => [255, 0, 0, 255],
-            getOrientation: (d) => [0, 0, 80],
+            getOrientation: (d) => [0, 0, 90],
             getPosition: (d) => {
               return d.geometry.coordinates;
             },

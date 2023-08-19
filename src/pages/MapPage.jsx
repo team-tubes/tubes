@@ -13,9 +13,12 @@ import { Map } from "react-map-gl";
 import chorus_data from "../InternetLayer";
 import MapToolTip from "../components/MapToolTip";
 import Modal from "../components/Modal";
+import {loadSuburbsAndLocalities } from '../data_parsers/SuburbsLocalities'
+import {getAirQuality, setAirQualityData} from '../data_parsers/AirQuality'
 
 // Source data GeoJSON
 const DATA_URL = "./Water_Hydrant.geojson"; // eslint-disable-line
+const AIR_QUALITY_DATA_URL = './Air_Quality.geojson';
 
 const COLOR_SCALE = scaleThreshold()
   .domain([
@@ -70,6 +73,17 @@ const landCover = [
     [-123.306, 49.196],
   ],
 ];
+
+
+// Fetch air quality data once.
+fetch(AIR_QUALITY_DATA_URL)
+.then((response) => {
+	return response.json();
+})
+.then((json) => {
+	setAirQualityData(json);
+});
+
 
 export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
   const [internetData, setInternetData] = useState();
@@ -155,6 +169,14 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
       initialViewState={INITIAL_VIEW_STATE}
       controller={true}
       getTooltip={() => MapToolTip()}
+      onHover={(info, event) =>
+        {
+          if(info === undefined || info.coordinate === undefined)
+            return;
+  
+          let coordinates = info.coordinate;
+          getAirQuality(coordinates[0], coordinates[1])
+        }}
     >
       <Map
         reuseMaps
@@ -163,6 +185,7 @@ export default function MapPage({ data = DATA_URL, mapStyle = MAP_STYLE }) {
         preventStyleDiffing={true}
         onLoad={(e) => {
           e.target.addLayer(mapboxBuildingLayer);
+          loadSuburbsAndLocalities(e.target);
         }}
       />
     </DeckGL></>

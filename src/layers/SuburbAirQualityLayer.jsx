@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { DeckGLOverlay } from "../pages/MapPage";
 import { GeoJsonLayer } from "deck.gl";
-
-const AIR_QUALITY_DATA_URL = "./Air_Quality.geojson";
+import { load } from "@loaders.gl/core";
+import { _GeoJSONLoader } from "@loaders.gl/json";
 
 export const SuburbAirQualityLayer = () =>
 {  
@@ -11,8 +11,8 @@ export const SuburbAirQualityLayer = () =>
 
     useEffect(() => {
       (async() => {
-        setSuburbData(await fetch_suburb_border_data());
-        setAirQualityData(await fetch_air_quality_data());
+        setSuburbData(await load("Suburb_Borders.geojson", _GeoJSONLoader));
+        setAirQualityData(await load("Air_Quality.geojson", _GeoJSONLoader));
       })();
     }, []);  
 
@@ -68,28 +68,6 @@ export const SuburbAirQualityLayer = () =>
       </>
     );
 };
-
-async function fetch_suburb_border_data()
-{
-  return fetch("./SuburbBorders.geojson")
-  .then((response) => {
-    return response.json();
-  })
-  .then((json) => {
-    return json;
-  })
-}
-
-async function fetch_air_quality_data()
-{
-  return fetch(AIR_QUALITY_DATA_URL)
-  .then((response) => {
-    return response.json();
-  })
-  .then((json) => {
-    return json;
-  });
-}
 
 function getClosestAirPointData(airGeojsonData, longitude, latitude) {
   if (

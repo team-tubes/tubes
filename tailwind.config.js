@@ -6,6 +6,10 @@ export default {
 			fontFamily: {
 				'space-mono': ['Space Mono', 'monospace'],
 			},
+			zIndex: {
+				'300': '300',
+				'400': '400',
+			}
 		},
 	},
 	plugins: [],

@@ -9,3 +9,17 @@ export function titleCase(str) {
 	// Directly return the joined string
 	return splitStr.join(' ');
 }
+
+// handle events between components
+export const eventBus = {
+	on(event, callback) {
+		document.addEventListener(event, (e) => callback(e.data));
+	},
+
+	dispatch(event, data) {
+		document.dispatchEvent(new CustomEvent(event, { data: data }));
+	},
+	remove(event, callback) {
+		document.removeEventListener(event, callback);
+	}
+};

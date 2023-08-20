@@ -4,6 +4,7 @@ import { format, fromUnixTime } from "date-fns";
 import { GeoJsonLayer } from "deck.gl";
 import { DeckGLOverlay } from "../pages/MapPage";
 import { _GeoJSONLoader } from "@loaders.gl/json";
+import { eventBus } from "../utils/utils";
 
 export const InternetLayer = ({ visible }) => {
   const [internetData, setInternetData] = useState();
@@ -21,7 +22,12 @@ export const InternetLayer = ({ visible }) => {
     })();
   }, []);
 
-
+  // close any previously open internet popups.
+  eventBus.on("openMapPopup", () =>
+  {
+    if(isPopupOpen)
+      setIsPopupOpen(false);
+  });
 
   return (
     <>
@@ -38,8 +44,8 @@ export const InternetLayer = ({ visible }) => {
             lineWidthScale: 3,
             filled: true,
             onClick: (e) => {
-              console.log(e);
               setCoordinates(e.coordinate);
+              eventBus.dispatch("openMapPopup", {});
               setIsPopupOpen(true);
               setSelectedRegion(e.object);
             },

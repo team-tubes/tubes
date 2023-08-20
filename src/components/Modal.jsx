@@ -1,13 +1,13 @@
 import React from "react";
 
-export default function Modal() {
+export function Modal() {
   const [showModal, setShowModal] = React.useState(true);
 
   return (
     <>
       {showModal ? (
         <>
-          <div className="justify-center items-center flex overflow-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+          <div className="justify-center items-center flex overflow-hidden overflow-y-auto fixed inset-0 z-400 outline-none focus:outline-none">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
               <div className=" rounded-2xl shadow-xl relative flex flex-col w-full bg-slate-900 border-2 border-slate-700 outline-none focus:outline-none  overflow-hidden">
@@ -47,7 +47,7 @@ export default function Modal() {
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-25 fixed inset-0 z-300 bg-black"></div>
         </>
       ) : null}
     </>

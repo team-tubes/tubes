@@ -15,9 +15,9 @@ function Collapsible(props) {
       <div className="flex items-center cursor-pointer justify-between" onClick={toggleOpen}>
         <h5 className="text-md font-semibold">Layer Controls</h5>
         {isOpen ? (
-          <FontAwesomeIcon icon={faChevronDown} />
-        ) : (
           <FontAwesomeIcon icon={faChevronUp} />
+        ) : (
+          <FontAwesomeIcon icon={faChevronDown} />
         )}
       </div>
       {isOpen && (

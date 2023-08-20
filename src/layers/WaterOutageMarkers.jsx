@@ -61,7 +61,7 @@ const WaterOutageMarker = (outage) => {
         style={{ zIndex: 100 }}
         latitude={latitude}
         longitude={longitude}
-        color="red"
+        color={isUnderway ? "red" : "orange"}
       >
         {isPopupOpen && (
           <Popup

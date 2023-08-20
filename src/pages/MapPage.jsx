@@ -15,6 +15,7 @@ import maplibregl from "maplibre-gl";
 import { useState } from "react";
 import { Checkbox } from "../components/CheckBox";
 import Collapsible from "../components/Collapsable";
+import { AverageDailyTrafficLayer } from "../layers/AverageDailyTrafficLayer";
 
 const INITIAL_VIEW_STATE = {
   latitude: -36.8509,
@@ -53,6 +54,10 @@ const allLayers = [
   },
   {
     name: "Suburb Air Quality",
+    checked: true,
+  },
+  {
+    name: "Average Daily Traffic",
     checked: true,
   },
 ];
@@ -140,6 +145,7 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
         <InternetLayer visible={activeLayers[1].checked} />
 
         <WaterOutageMarkers visible={activeLayers[2].checked} />
+        <AverageDailyTrafficLayer visible={activeLayers[5].checked} />
         <NavigationControl />
       </Map>
     </div>

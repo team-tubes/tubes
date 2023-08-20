@@ -10,6 +10,11 @@ export function titleCase(str) {
 	return splitStr.join(' ');
 }
 
+export class PopupHelper
+{
+	static POPUP_OPEN = false;
+}
+
 // handle events between components
 export const eventBus = {
 	on(event, callback) {

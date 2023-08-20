@@ -7,7 +7,7 @@ import { _GeoJSONLoader } from "@loaders.gl/json";
 import { buffer } from "@turf/turf";
 import { load } from "@loaders.gl/core";
 import { OBJLoader } from "@loaders.gl/obj";
-import { eventBus } from "../utils/utils";
+import { eventBus, PopupHelper } from "../utils/utils";
 
 export const FireHydrantLayer = () => {
   const [fireHydrantData, setHydrantData] = useState();
@@ -20,6 +20,10 @@ export const FireHydrantLayer = () => {
       setHydrantData(data);
     })();
   }, []);
+
+  useEffect(() => {
+    PopupHelper.POPUP_OPEN = isPopupOpen;
+  }, [isPopupOpen]);
 
   // close any previously fire hydrant popups.
   eventBus.on("openMapPopup", () =>
@@ -45,10 +49,14 @@ export const FireHydrantLayer = () => {
             sizeScale: 0.1,
             minzoom: 19,
             onClick: (e) => {
+              if(PopupHelper.POPUP_OPEN)
+                return;
+
               setCoordinates(e.coordinate); 
               eventBus.dispatch("openPopup", {}); 
               setIsPopupOpen(true); 
               setSelectedFireHydrant(e.object);
+              PopupHelper.POPUP_OPEN = true;
             },
             pickable: true,
           }),

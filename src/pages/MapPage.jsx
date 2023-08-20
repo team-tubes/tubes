@@ -61,9 +61,13 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
       >
         <Modal />        
         <SuburbAirQualityLayer />
-        <InternetLayer />
-        <WaterPipeLayer />
+
+        {/* MapBoxLayer doesn't have support for cancelling event propagation onClick for some reason but marker objects do.
+            Order matters for interactivity, this is slightly a hack lol. See each layer's individual onClick for more info.
+            Some elements might not be easily interactable, but this is caused by the issue of no way to handle overlapping layers. */}
+        <WaterPipeLayer />        
         <FireHydrantLayer />
+        <InternetLayer />
 
         <WaterOutageMarkers />
         <NavigationControl />

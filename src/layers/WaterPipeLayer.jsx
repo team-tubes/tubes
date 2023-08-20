@@ -5,7 +5,7 @@ import { DeckGLOverlay } from "../pages/MapPage";
 import {_GeoJSONLoader} from '@loaders.gl/json';
 import {buffer} from '@turf/turf'
 import {load} from '@loaders.gl/core';
-import { eventBus } from "../utils/utils";
+import { eventBus, PopupHelper } from "../utils/utils";
 
 
 export const WaterPipeLayer = () => {
@@ -39,6 +39,10 @@ export const WaterPipeLayer = () => {
 	})()
   }, []);
 
+  useEffect(() => {
+    PopupHelper.POPUP_OPEN = isPopupOpen;
+  }, [isPopupOpen]);
+
   // close any previously open water pipe popups.
   eventBus.on("openMapPopup", () =>
   {
@@ -50,20 +54,29 @@ export const WaterPipeLayer = () => {
     <>
         <DeckGLOverlay
           layers={[	
-          new GeoJsonLayer({
-            id: "geojson3",
-            data: waterPipeData?.features || [],
-            extruded: true,
-            getFillColor: (f) => startBlue.map((color, index) => Math.round(color + (endBlue[index] - color) * ((timerValue * f.properties.NOM_DIA_MM / 500) / 100))),
-            pickable: true,
-            stroked: false,
-            filled: true,
-            lineJointRounded: true,
-            getElevation: (f) => f.properties.NOM_DIA_MM / 100,
-            
-            updateTriggers: {getFillColor: [timerValue]},
-            // getLineWidth: (f) => f.properties.NOM_DIA_MM * 10 ,
-            onClick: e => {setCoordinates(e.coordinate); eventBus.dispatch("openPopup", {}); setIsPopupOpen(true); setSelectedPipe(e.object)}
+            new GeoJsonLayer({
+              id: "geojson3",
+              data: waterPipeData?.features || [],
+              extruded: true,
+              getFillColor: (f) => startBlue.map((color, index) => Math.round(color + (endBlue[index] - color) * ((timerValue * f.properties.NOM_DIA_MM / 500) / 100))),
+              pickable: true,
+              stroked: false,
+              filled: true,
+              lineJointRounded: true,
+              getElevation: (f) => f.properties.NOM_DIA_MM / 100,
+              
+              updateTriggers: {getFillColor: [timerValue]},
+              // getLineWidth: (f) => f.properties.NOM_DIA_MM * 10 ,
+              onClick: e => {
+                if(PopupHelper.POPUP_OPEN)
+                  return;
+
+                setCoordinates(e.coordinate); 
+                eventBus.dispatch("openPopup", {}); 
+                setIsPopupOpen(true); 
+                setSelectedPipe(e.object);
+                PopupHelper.POPUP_OPEN = true;
+              }
             }),
           ]}
         />

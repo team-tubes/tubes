@@ -42,3 +42,7 @@
 .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip {
   border-top-color: rgb(38, 38, 38) !important;
 }
+
+body .mapboxgl-map {
+  font-family: "space mono";
+}

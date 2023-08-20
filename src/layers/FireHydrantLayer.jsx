@@ -1,10 +1,8 @@
-import { Marker, Popup } from "react-map-gl";
+import { Popup } from "react-map-gl";
 import { useEffect, useState } from "react";
-import { format, parseISO, intervalToDuration } from "date-fns";
-import { GeoJsonLayer, SimpleMeshLayer } from "deck.gl";
+import { SimpleMeshLayer } from "deck.gl";
 import { DeckGLOverlay } from "../pages/MapPage";
 import { _GeoJSONLoader } from "@loaders.gl/json";
-import { buffer } from "@turf/turf";
 import { load } from "@loaders.gl/core";
 import { OBJLoader } from "@loaders.gl/obj";
 import { eventBus, PopupHelper } from "../utils/utils";

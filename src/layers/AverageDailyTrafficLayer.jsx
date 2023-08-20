@@ -66,7 +66,7 @@ export const AverageDailyTrafficLayer = ({ visible }) => {
               id: 'averagedailytraffic',
               data: averageDailyTrafficData?.features || [],
               getPolygon: (d) => d.geometry.coordinates,
-              getLineWidth: 25,
+              getLineWidth: 10,
               getLineColor,
               visible: visible,
               pickable: true,
@@ -100,6 +100,9 @@ export const AverageDailyTrafficLayer = ({ visible }) => {
               <p className="flex flex-row w-full">
                 <span className="text-purple-200 font-semibold mr-1">Average Daily Traffic: </span> {selectedAdt.properties?.adt}
               </p>  
+              <p className="flex flex-row w-full">
+                <span className="text-purple-200 font-semibold mr-1">---------</span>
+              </p> 
               <p className="flex flex-row w-full">
                 <span className="text-purple-200 font-semibold mr-1">Start point: </span> {selectedAdt.properties?.start_name}
               </p>  

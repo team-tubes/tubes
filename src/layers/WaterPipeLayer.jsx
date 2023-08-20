@@ -78,7 +78,7 @@ export const WaterPipeLayer = () => {
             onClose={() => {
               setIsPopupOpen(false);
               setCoordinates(undefined);
-              setSelectedPipe(undefined)
+              setSelectedPipe(undefined);
             }}
           >
             <div className="m-3 flex flex-col justfiy-start ">

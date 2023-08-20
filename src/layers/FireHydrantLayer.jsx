@@ -7,6 +7,7 @@ import { _GeoJSONLoader } from "@loaders.gl/json";
 import { buffer } from "@turf/turf";
 import { load } from "@loaders.gl/core";
 import { OBJLoader } from "@loaders.gl/obj";
+import { eventBus } from "../utils/utils";
 
 export const FireHydrantLayer = () => {
   const [fireHydrantData, setHydrantData] = useState();
@@ -19,6 +20,13 @@ export const FireHydrantLayer = () => {
       setHydrantData(data);
     })();
   }, []);
+
+  // close any previously fire hydrant popups.
+  eventBus.on("openMapPopup", () =>
+  {
+    if(isPopupOpen)
+      setIsPopupOpen(false);
+  });
 
   return (
     <>
@@ -36,6 +44,13 @@ export const FireHydrantLayer = () => {
             mesh: "fire-hydrant.obj",
             sizeScale: 0.1,
             minzoom: 19,
+            onClick: (e) => {
+              setCoordinates(e.coordinate); 
+              eventBus.dispatch("openPopup", {}); 
+              setIsPopupOpen(true); 
+              setSelectedFireHydrant(e.object);
+            },
+            pickable: true,
           }),
         ]}
       />
@@ -43,7 +58,7 @@ export const FireHydrantLayer = () => {
       {isPopupOpen && (
         <Popup
           style={{ zIndex: 100 }}
-          className="text-gray-700 focus:outline-none font-space-mono"
+          className="text-gray-700 text-neutral-100 focus:outline-none font-space-mono"
           closeOnClick={true}
           latitude={coordinates?.[1] || 0}
           longitude={coordinates?.[0] || 0}
@@ -54,22 +69,15 @@ export const FireHydrantLayer = () => {
           }}
         >
           <div className="m-3  flex flex-col justfiy-start ">
-            {/* <span className="font-semibold text-lg">{selectedPipe.properties.FAC_DESC === "Not Applicable" ? "Water Pipe: " + selectedPipe.properties.USE_AREAID : "Water Pipe: "+selectedPipe.properties.FAC_DESC}</span>
+             <span className="text-purple-200 font-semibold text-lg">
+                Hydrant: #001
+              </span>
               <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Installed: </span> {new Date(selectedPipe.properties.INSTALLED).toDateString()}
+                <span className="text-purple-200 font-semibold mr-1">Installed: </span> {new Date(selectedFireHydrant.properties.INSTALLED).toDateString()}
               </p>
               <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Material: </span> {selectedPipe.properties.MATERIAL}
+                <span className="text-purple-200 font-semibold mr-1">Status: </span> {selectedFireHydrant.properties.STATUS === "OP" ? "Operational" : "Not Operational"}
               </p>
-              <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Position: </span> {selectedPipe.properties.POSITION}
-              </p>
-              <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Length: </span> {selectedPipe.properties.SHAPE_Length.toFixed(2) + "m"}
-              </p>
-              <p className="flex flex-row w-full">
-                <span className="font-semibold mr-1">Diameter: </span> {selectedPipe.properties.NOM_DIA_MM.toFixed(2) + "mm"}
-              </p> */}
           </div>
         </Popup>
       )}

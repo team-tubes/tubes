@@ -16,6 +16,7 @@ import { useState } from "react";
 import { Checkbox } from "../components/CheckBox";
 import Collapsible from "../components/Collapsable";
 import { AverageDailyTrafficLayer } from "../layers/AverageDailyTrafficLayer";
+import { CoastalHazardLayer } from "../layers/CoastalHazardLayer";
 
 const INITIAL_VIEW_STATE = {
   latitude: -36.8509,
@@ -58,6 +59,10 @@ const allLayers = [
   },
   {
     name: "Average Daily Traffic",
+    checked: true,
+  },
+  {
+    name: "Coastal Hazard",
     checked: true,
   },
 ];
@@ -146,6 +151,7 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
 
         <WaterOutageMarkers visible={activeLayers[2].checked} />
         <AverageDailyTrafficLayer visible={activeLayers[5].checked} />
+        <CoastalHazardLayer visible={activeLayers[6].checked}/>
         <NavigationControl />
       </Map>
     </div>

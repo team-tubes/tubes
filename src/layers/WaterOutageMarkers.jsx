@@ -39,6 +39,9 @@ const WaterOutageMarker = (outage) => {
 
   const start = parseISO(startDate);
 
+  const current = new Date();
+  const isUnderway = current.getTime() > start.getTime();
+
   // close any previously open water outage markers.
   eventBus.on("openMapPopup", () =>
   {
@@ -90,6 +93,10 @@ const WaterOutageMarker = (outage) => {
                 <span className="text-purple-200 font-semibold"> Start:</span>{" "}
                 {format(start, "HH:mm eee do MMM yyyy")}
               </span>
+              {isUnderway && (
+                <span className="text-purple-200 font-semibold"> Currently underway
+                </span>
+              )}
             </div>
           </Popup>
         )}

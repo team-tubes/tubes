@@ -70,7 +70,7 @@ export const FireHydrantLayer = () => {
         >
           <div className="m-3  flex flex-col justfiy-start ">
              <span className="text-purple-200 font-semibold text-lg">
-                Hydrant: #001
+                Fire Hydrant {selectedFireHydrant.properties.OBJECTID}
               </span>
               <p className="flex flex-row w-full">
                 <span className="text-purple-200 font-semibold mr-1">Installed: </span> {new Date(selectedFireHydrant.properties.INSTALLED).toDateString()}

@@ -142,10 +142,10 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
         <SuburbAirQualityLayer visible={activeLayers[4].checked} />
         <WaterPipeLayer visible={activeLayers[3].checked} />
         <FireHydrantLayer visible={activeLayers[0].checked} />
+        <AverageDailyTrafficLayer visible={activeLayers[5].checked} />
         <InternetLayer visible={activeLayers[1].checked} />
 
         <WaterOutageMarkers visible={activeLayers[2].checked} />
-        <AverageDailyTrafficLayer visible={activeLayers[5].checked} />
         <NavigationControl />
       </Map>
     </div>

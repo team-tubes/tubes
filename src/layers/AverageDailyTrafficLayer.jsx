@@ -4,17 +4,33 @@ import { DeckGLOverlay } from "../pages/MapPage";
 import {_GeoJSONLoader} from '@loaders.gl/json';
 import {load} from '@loaders.gl/core';
 import { scaleThreshold } from "d3-scale";
+import { eventBus, PopupHelper } from "../utils/utils";
+import { Popup } from "react-map-gl";
 
 
 export const AverageDailyTrafficLayer = ({ visible }) => {
   const [averageDailyTrafficData, setaverageDailyTrafficData] = useState()
-  
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [selectedAdt, setSelectedAdt] = useState()
+  const [coordinates, setCoordinates] = useState()
+
   useEffect(() => {
 	(async () => {
 		const tsData = await load("TrafficService.json", _GeoJSONLoader);
 		setaverageDailyTrafficData(tsData)
 	})()
   }, []);
+
+  useEffect(() => {
+    PopupHelper.POPUP_OPEN = isPopupOpen;
+  }, [isPopupOpen]);
+
+  eventBus.on("openMapPopup", () =>
+  {
+    if(isPopupOpen)
+      setIsPopupOpen(false);
+  });
+
 
   const getLineColor = (point) => {
     let adtCount = point.properties.adt;
@@ -26,7 +42,7 @@ export const AverageDailyTrafficLayer = ({ visible }) => {
   };
 
   const opacity = 150;
-  
+
   const BAD_COLOR_SCALE = scaleThreshold()
   .domain([2400, 4000, 8800, 11200, 15000, 23200, 30000, 45400, 85000, 109400])
   .range([
@@ -52,10 +68,41 @@ export const AverageDailyTrafficLayer = ({ visible }) => {
               getPolygon: (d) => d.geometry.coordinates,
               getLineWidth: 25,
               getLineColor,
-              visible: visible
+              visible: visible,
+              pickable: true,
+              onClick: e => {
+                if(PopupHelper.POPUP_OPEN)
+                  return;
+                setCoordinates(e.coordinate); 
+                eventBus.dispatch("openPopup", {}); 
+                setIsPopupOpen(true); 
+                setSelectedAdt(e.object);
+                PopupHelper.POPUP_OPEN = true;
+              },
             }),
           ]}
         />
+        {isPopupOpen && (
+          <Popup
+            style={{ zIndex: 100 }}
+            className="text-gray-700 focus:outline-none text-neutral-100 font-space-mono"
+            closeOnClick={true}
+            latitude={coordinates?.[1] || 0}
+            longitude={coordinates?.[0] || 0}
+            onClose={() => {
+              setIsPopupOpen(false);
+              setCoordinates(undefined);
+              setSelectedAdt(undefined);
+            }}
+          >
+            <div className="m-3 flex flex-col justfiy-start ">
+              <span className="font-semibold text-lg text-purple-200">{selectedAdt.properties?.road_name}</span>
+              <p className="flex flex-row w-full">
+                <span className="text-purple-200 font-semibold mr-1">Average Daily Traffic: </span> {selectedAdt.properties?.adt}
+              </p>  
+            </div>
+          </Popup>
+        )}
     </>
   );
 };

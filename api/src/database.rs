@@ -62,6 +62,35 @@ impl ComplaintsRepository {
             })
             .collect())
     }
+
+    pub async fn delete_complaint(&self, id: u32) -> Result<Complaint, sqlx::Error> {
+        let mut transaction = self.0.begin().await?;
+
+        let x = sqlx::query!(
+            "delete from complaints where id = $1 returning *",
+            id as i64
+        )
+        .fetch_one(&mut *transaction)
+        .await?;
+
+        transaction.commit().await?;
+
+        Ok(Complaint {
+            id: x.id,
+            description: x.complaint,
+            location: Location {
+                lat: x.lat,
+                lng: x.lng,
+                address: x.address,
+            },
+            person: Person {
+                email: x.email,
+                first_name: x.first_name,
+                last_name: x.last_name,
+                phone: x.phone,
+            },
+        })
+    }
 }
 
 #[poem::async_trait]

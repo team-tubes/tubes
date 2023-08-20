@@ -8,7 +8,7 @@ import {load} from '@loaders.gl/core';
 import { eventBus, PopupHelper } from "../utils/utils";
 
 
-export const WaterPipeLayer = () => {
+export const WaterPipeLayer = ({ visible }) => {
   const [waterPipeData, setWaterPipeData] = useState()
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [selectedPipe, setSelectedPipe] = useState()
@@ -76,7 +76,8 @@ export const WaterPipeLayer = () => {
                 setIsPopupOpen(true); 
                 setSelectedPipe(e.object);
                 PopupHelper.POPUP_OPEN = true;
-              }
+              },
+              visible: visible
             }),
           ]}
         />

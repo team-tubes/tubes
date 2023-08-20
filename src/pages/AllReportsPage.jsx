@@ -1,6 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-import IssueList from "../components/IssueList";
-import Search from "../components/Search";
+import { useEffect, useState } from "react";
 import ReportCard from "../components/ReportCard";
 
 async function getReports(offset, limit) {

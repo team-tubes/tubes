@@ -9,7 +9,7 @@ import { load } from "@loaders.gl/core";
 import { OBJLoader } from "@loaders.gl/obj";
 import { eventBus, PopupHelper } from "../utils/utils";
 
-export const FireHydrantLayer = () => {
+export const FireHydrantLayer = ({ visible }) => {
   const [fireHydrantData, setHydrantData] = useState();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedFireHydrant, setSelectedFireHydrant] = useState();
@@ -59,6 +59,7 @@ export const FireHydrantLayer = () => {
               PopupHelper.POPUP_OPEN = true;
             },
             pickable: true,
+            visible: visible
           }),
         ]}
       />

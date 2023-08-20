@@ -4,7 +4,7 @@ import { GeoJsonLayer } from "deck.gl";
 import { load } from "@loaders.gl/core";
 import { _GeoJSONLoader } from "@loaders.gl/json";
 
-export const SuburbAirQualityLayer = () =>
+export const SuburbAirQualityLayer = ({ visible }) =>
 {  
     const [suburbData, setSuburbData] = useState();
     const [airQualityData, setAirQualityData] = useState();  
@@ -29,6 +29,7 @@ export const SuburbAirQualityLayer = () =>
               filled: true,
               extruded: false,
               wireframe: false,
+              visible: visible,
               getElevation: (f) => Math.random(),
               getFillColor: (d) => {
                 const sumLatLng = d.geometry.coordinates[0].reduce(

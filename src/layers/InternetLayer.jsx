@@ -6,7 +6,7 @@ import { DeckGLOverlay } from "../pages/MapPage";
 import { _GeoJSONLoader } from "@loaders.gl/json";
 import { eventBus, PopupHelper } from "../utils/utils";
 
-export const InternetLayer = () => {
+export const InternetLayer = ({ visible }) => {
   const [internetData, setInternetData] = useState();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState();
@@ -57,6 +57,7 @@ export const InternetLayer = () => {
               setSelectedRegion(e.object);
               PopupHelper.POPUP_OPEN = true;
             },
+            visible: visible
           }),
         ]}
       />

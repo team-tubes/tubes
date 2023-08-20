@@ -139,6 +139,20 @@ impl Api {
             ))),
         }
     }
+
+    #[oai(path = "/complaints/:id", method = "delete")]
+    async fn delete_complaint(
+        &self,
+        id: Query<u32>,
+        complaint_repo: ComplaintsRepository,
+    ) -> Result<Json<Complaint>> {
+        Ok(Json(complaint_repo.delete_complaint(id.0).await.map_err(
+            |err| {
+                error!("Error deleting complaint {}", err);
+                Error::from_status(StatusCode::INTERNAL_SERVER_ERROR)
+            },
+        )?))
+    }
 }
 
 fn default_limit() -> u32 {

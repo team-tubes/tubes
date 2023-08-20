@@ -1,8 +1,8 @@
-import React, { useContext, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContextProvider";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { z } from "zod";
-import { toFormikValidate, toFormikValidationSchema } from "zod-formik-adapter";
+import { toFormikValidate } from "zod-formik-adapter";
 
 const schema = z.object({
   fname: z.string({
@@ -33,8 +33,7 @@ const schema = z.object({
 });
 
 export default function ReportPage() {
-  const { issues, loading } = useContext(AppContext);
-  const [query, setQuery] = useState("");
+  const { loading } = useContext(AppContext);
 
   const [lat, setLat] = useState();
   const [lng, setLng] = useState();
@@ -205,7 +204,7 @@ export default function ReportPage() {
                     </label>
 
                     <Field
-                      type="numebr"
+                      type="number"
                       id="lat"
                       name="lat"
                       className="block bg-neutral-800 p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md w-full rounded-lg"

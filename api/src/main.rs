@@ -75,7 +75,6 @@ async fn main() -> Result<(), std::io::Error> {
     let spec = api_service.spec_endpoint();
 
     let app = Route::new()
-        .at("/", EmbeddedFileEndpoint::<Files>::new("index.html"))
         .at(
             "/view_complaints",
             EmbeddedFileEndpoint::<Files>::new("view_complaints.html"),

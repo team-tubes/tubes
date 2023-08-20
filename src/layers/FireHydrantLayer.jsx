@@ -87,6 +87,9 @@ export const FireHydrantLayer = ({ visible }) => {
               <p className="flex flex-row w-full">
                 <span className="text-purple-200 font-semibold mr-1">Status: </span> {selectedFireHydrant.properties.STATUS === "OP" ? "Operational" : "Not Operational"}
               </p>
+              <p className="flex flex-row w-full">
+                <span className="text-purple-200 font-semibold mr-1">Accuracy: </span> {selectedFireHydrant.properties.ACCURACY}
+              </p>
           </div>
         </Popup>
       )}

@@ -12,9 +12,9 @@ import { InternetLayer } from "../layers/InternetLayer";
 import { SuburbAirQualityLayer } from "../layers/SuburbAirQualityLayer";
 
 import maplibregl from "maplibre-gl";
-import { ControlBox } from "../components/ControlBox";
 import { useState } from "react";
 import { Checkbox } from "../components/CheckBox";
+import Collapsible from "../components/Collapsable";
 
 const INITIAL_VIEW_STATE = {
   latitude: -36.8509,
@@ -92,8 +92,7 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
 
   return (
     <div className="w-full h-full">
-      <div className="absolute bg-white top-12 right-6 m-5 p-6 z-50 text-black">
-        <h5 className="text-md font-semibold mb-4">Layer Control</h5>
+      <Collapsible>
         <div className="flex flex-row items-center mb-2">
           <button
             className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2 text-sm"
@@ -101,11 +100,13 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
           >
             Select All
           </button>
-          <p className="font-bold text-indigo-800 hover:cursor-pointer text-sm" onClick={unSelectAll}>
+          <p
+            className="font-bold text-indigo-800 hover:cursor-pointer text-sm"
+            onClick={unSelectAll}
+          >
             Clear
           </p>
         </div>
-
         {activeLayers.map((layer, index) => (
           <Checkbox
             key={layer.name}
@@ -115,7 +116,7 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
             index={index}
           />
         ))}
-      </div>
+      </Collapsible>
       <Map
         style={{ width: "100vw", height: "100vh" }}
         initialViewState={INITIAL_VIEW_STATE}
@@ -129,12 +130,12 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
         }}
       >
         <Modal />
-        <SuburbAirQualityLayer visible={activeLayers[4].checked}/>
-        <InternetLayer visible={activeLayers[1].checked}/>
-        <WaterPipeLayer visible={activeLayers[3].checked}/>
-        <FireHydrantLayer visible={activeLayers[0].checked}/>
+        <SuburbAirQualityLayer visible={activeLayers[4].checked} />
+        <InternetLayer visible={activeLayers[1].checked} />
+        <WaterPipeLayer visible={activeLayers[3].checked} />
+        <FireHydrantLayer visible={activeLayers[0].checked} />
 
-        <WaterOutageMarkers visible={activeLayers[2].checked}/>
+        <WaterOutageMarkers visible={activeLayers[2].checked} />
         <NavigationControl />
       </Map>
     </div>

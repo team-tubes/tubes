@@ -11,7 +11,7 @@ function Collapsible(props) {
   };
 
   return (
-    <div className="absolute bg-white top-24 right:1/2 p-3 md:top-12 md:right-6 m-1 md:m-5 md:p-5 z-50 text-black w-60">
+    <div className="absolute bg-neutral-800 text-neutral-100 rounded-md top-24 right:1/2 p-3 md:top-11 md:right-6 m-1 md:m-5 md:p-5 z-50 text-black w-60">
       <div className="flex items-center cursor-pointer justify-between" onClick={toggleOpen}>
         <h5 className="text-md font-semibold">Layer Controls</h5>
         {isOpen ? (

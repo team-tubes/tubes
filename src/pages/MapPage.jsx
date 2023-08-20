@@ -95,13 +95,13 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
       <Collapsible>
         <div className="flex flex-row items-center mb-2">
           <button
-            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2 text-sm"
+            className="bg-purple-200 hover:bg-purple-300 text-neutral-800 font-bold py-2 px-4 rounded mr-2 text-sm"
             onClick={selectAll}
           >
             Select All
           </button>
           <p
-            className="font-bold text-indigo-800 hover:cursor-pointer text-sm"
+            className="font-bold text-purple-200 underline hover:cursor-pointer text-sm"
             onClick={unSelectAll}
           >
             Clear

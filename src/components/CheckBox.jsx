@@ -6,10 +6,10 @@ export const Checkbox = ({ isChecked, label, checkHandler, index }) => {
         id={`checkbox-${index}`}
         checked={isChecked}
         onChange={checkHandler}
-        className="w-4 h-4 text-blue-600  rounded focus:ring-blue-600 ring-offset-gray-800 focus:ring-2 bg-gray-700 border-gray-600 hover:cursor-pointer"
+        className="w-4 h-4  rounded focus:ring-blue-600 ring-offset-gray-800 focus:ring-2 accent-purple-200 hover:accent-purple-300 hover:cursor-pointer"
       />
       <label
-        className="ml-2 text-sm font-medium text-gray-900"
+        className="ml-2 text-sm font-medium text-neutral-100"
         htmlFor={`checkbox-${index}`}
       >
         {label}

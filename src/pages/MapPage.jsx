@@ -91,7 +91,7 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
   };
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-[calc(100vh-52px)]">
       <Collapsible>
         <div className="flex flex-row items-center mb-2">
           <button
@@ -118,7 +118,7 @@ export default function MapPage({ mapStyle = MAP_STYLE }) {
         ))}
       </Collapsible>
       <Map
-        style={{ width: "100vw", height: "100vh" }}
+        style={{ width: "100vw", height: "100%" }}
         initialViewState={INITIAL_VIEW_STATE}
         reuseMaps
         mapboxAccessToken="pk.eyJ1Ijoic3NuZXZlcmEiLCJhIjoiY2xsaHB4c3JoMWM2ZDNkcGtzOXJyemE4dCJ9.1OH8vr4265s8adq2s3fCuA"

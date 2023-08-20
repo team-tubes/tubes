@@ -4,9 +4,16 @@ import { useNavigate } from "react-router-dom";
 export default function IssueCard({ suburb, issues }) {
 	const navigate = useNavigate();
 	const handleClick = () => {
-		console.log(issues.id)
 		navigate(issues.id)
 	};
+
+	const getAssets = () => {
+		// generate num assets based on hash of the name
+		const len = suburb.length
+		const numAssets = (len * 37599) % 97
+		return numAssets
+	}
+
 	const numIssues =
 		issues.waterIssues.length +
 		issues.powerIssues.length +
@@ -25,7 +32,7 @@ export default function IssueCard({ suburb, issues }) {
 						{numIssues > 1 && `${numIssues} Active Issues`}
 					</p>
 					<p className="font-medium my-2 text-sm md:text-md text-gray-200">
-						{Math.round(Math.random() * 10000)} Assets Available
+						{getAssets()} Assets Available
 					</p>
 				</div>
 			</div>

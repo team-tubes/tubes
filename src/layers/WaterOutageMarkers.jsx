@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { format, parseISO, intervalToDuration } from "date-fns";
 import { eventBus } from "../utils/utils";
 
-export const WaterOutageMarkers = () => {
+export const WaterOutageMarkers = ({ visible }) => {
   const [waterOutageData, setWaterOutageData] = useState([]);
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export const WaterOutageMarkers = () => {
 
   return (
     <>
-      {waterOutageData.map((outage) => {
+      {visible && waterOutageData.map((outage) => {
         return <WaterOutageMarker key={outage.outageId} {...outage} />;
       })}
     </>
@@ -58,14 +58,14 @@ const WaterOutageMarker = (outage) => {
           eventBus.dispatch("openMapPopup", {});
           setIsPopupOpen(true);
         }}
-        style={{ zIndex: 100 }}
+        style={{ zIndex: 20 }}
         latitude={latitude}
         longitude={longitude}
         color={isUnderway ? "red" : "orange"}
       >
         {isPopupOpen && (
           <Popup
-            style={{ zIndex: 100 }}
+            style={{ zIndex: 20 }}
             className="text-gray-700 text-neutral-100 focus:outline-none font-space-mono"
             closeOnClick={true}
             latitude={latitude}

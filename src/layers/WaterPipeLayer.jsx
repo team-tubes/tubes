@@ -8,7 +8,7 @@ import {load} from '@loaders.gl/core';
 import { eventBus } from "../utils/utils";
 
 
-export const WaterPipeLayer = () => {
+export const WaterPipeLayer = ({ visible }) => {
   const [waterPipeData, setWaterPipeData] = useState()
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [selectedPipe, setSelectedPipe] = useState()
@@ -63,7 +63,8 @@ export const WaterPipeLayer = () => {
             
             updateTriggers: {getFillColor: [timerValue]},
             // getLineWidth: (f) => f.properties.NOM_DIA_MM * 10 ,
-            onClick: e => {setCoordinates(e.coordinate); eventBus.dispatch("openPopup", {}); setIsPopupOpen(true); setSelectedPipe(e.object)}
+            onClick: e => {setCoordinates(e.coordinate); eventBus.dispatch("openPopup", {}); setIsPopupOpen(true); setSelectedPipe(e.object)},
+            visible: visible
             }),
           ]}
         />

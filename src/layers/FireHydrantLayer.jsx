@@ -8,7 +8,7 @@ import { buffer } from "@turf/turf";
 import { load } from "@loaders.gl/core";
 import { OBJLoader } from "@loaders.gl/obj";
 
-export const FireHydrantLayer = () => {
+export const FireHydrantLayer = ({ visible }) => {
   const [fireHydrantData, setHydrantData] = useState();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedFireHydrant, setSelectedFireHydrant] = useState();
@@ -36,6 +36,7 @@ export const FireHydrantLayer = () => {
             mesh: "fire-hydrant.obj",
             sizeScale: 0.1,
             minzoom: 19,
+            visible: visible
           }),
         ]}
       />

@@ -157,8 +157,7 @@ export default function ReportPage() {
                     id="address"
                     name="address"
                     className="block bg-neutral-800 w-full p-4 placeholder:text-neutral-400 text-md text-white border border-gray-600 text-md min-w-[500px] rounded-lg "
-                    placeholder="E.g. 27D Te Waerenga Rd, Hamurana Springs	"
-                    required
+                    placeholder="E.g. 27D Te Waerenga Rd, Hamurana Springs"
                   />
                   <ErrorMessage name="address" component="div" />
 
